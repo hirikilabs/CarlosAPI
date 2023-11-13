@@ -16,12 +16,17 @@ func main() {
 
 	// init
 	config.NoRecording()
+
+	// run sheduler on another thread
+	go controllers.RunScheduling()
 	
+	// create HTTP routes
 	router := mux.NewRouter()
 	routes.RegisterRoutes(router)
 	http.Handle("/", router)
+
+	// launch server
 	log.Printf("CarlosAPI version %s Listening on port %d", conf.Version, conf.Port)
-	go controllers.RunScheduling()
 	addr := fmt.Sprintf("%s:%d", conf.Addr, conf.Port) 
 	log.Fatal(http.ListenAndServe(addr, router))
 }
