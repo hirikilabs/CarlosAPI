@@ -10,10 +10,6 @@ import (
 	"net/http"
 )
 
-const (
-	port int = 8080
-)
-
 func main() {
 	// get config
 	conf := config.GetConfig()
