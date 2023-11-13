@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// "/" return configuration parameters
 func Root(writer http.ResponseWriter, request *http.Request) {
 	conf := config.GetConfig()
 
@@ -22,6 +23,7 @@ func Root(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
+// "/status" returns all the recording stored
 func GetStatus(writer http.ResponseWriter, request *http.Request) {
 	recordings := models.GetRecordings()
 
@@ -31,6 +33,7 @@ func GetStatus(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
+// "/status/id" returns the status of a recording identified by it's ID
 func GetStatusId(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	varid := vars["id"]
@@ -46,6 +49,8 @@ func GetStatusId(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
+// "/clear" clears all the data
+// TODO: don't expose this API on prodution
 func ClearDatabase(writer http.ResponseWriter, request *http.Request) {
 	models.ClearDB()
 	res := []byte("{'clear'='ok'}")
@@ -54,6 +59,8 @@ func ClearDatabase(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
+// creates a new recording
+// TODO: validate fields
 func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 	newRecording := &models.Recording{}
 	utils.ParseBody(request, newRecording)
@@ -67,6 +74,7 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
+// Scheduler, checks for due recordings and launches them
 // launched on another thread
 func RunScheduling() {
 	log.Println("Starting Scheduler")
@@ -90,10 +98,16 @@ func RunScheduling() {
 	}
 }
 
+
+// runs the record software
+// launched on another thread
+// TODO: do it for real
 func RunProcess(rec models.Recording) {
 	time.Sleep(10 * time.Second)
 	log.Printf("Finishing %v\n", rec.Id)
+	// update recording status
 	rec.Status = models.Finished
 	rec.Update()
+	// not recording anymore
 	config.NoRecording()
 }
