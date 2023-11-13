@@ -6,6 +6,7 @@ import(
 	"gorm.io/gorm"
 )
 
+// strings that represent the status of the recordings
 const(
 	Created = "Created"
 	Running = "Running"
@@ -13,11 +14,6 @@ const(
 )
 
 var db *gorm.DB
-
-type RotorPos struct {
-	az float32
-	el float32
-}
 
 type RecordStatus string
 
@@ -41,26 +37,32 @@ type Recording struct {
 
 
 func init() {
+	// connect to the database and create the tables if needed
 	conf := config.GetConfig()
 	database.ConnectDB(conf.Database)
 	db = database.GetDB()
 	db.AutoMigrate(&Recording{})
 }
 
+// add a recording to the database
 func (r *Recording) CreateRecording() *Recording {
 	db.Create(&r)
 	return r
 }
 
+// update a recording
 func (r *Recording) Update() *Recording {
 	db.Save(&r)
 	return r
 }
 
+// clear all the data in the database
+// TODO: don't expose this API or remove
 func ClearDB() {
 	db.Where("1 = 1").Delete(&Recording{})
 }
 
+// Get all recordings
 func GetRecordings() []Recording {
 	var Recordings []Recording
 	db.Find(&Recordings)
@@ -68,6 +70,7 @@ func GetRecordings() []Recording {
 }
 
 
+// Get a recording by it's ID
 func GetRecordingById(Id int64) (*Recording, *gorm.DB) {
 	var getRecording Recording
 	db := db.Where("id=?", Id).Find(&getRecording)
