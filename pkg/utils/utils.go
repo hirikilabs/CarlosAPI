@@ -13,7 +13,7 @@ func ParseBody(r *http.Request, x interface{}) {
 
 	err := json.Unmarshal(reqBody, x)
 	if err != nil {
-		log.Printf("Error decoding body: %v", err.Error())
+		log.Printf("❌ Error decoding body: %v", err.Error())
 		return
 	}
 }

@@ -39,7 +39,7 @@ func GetStatusId(writer http.ResponseWriter, request *http.Request) {
 	varid := vars["id"]
 	id, err := strconv.ParseInt(varid, 0, 0)
 	if err != nil {
-		log.Printf("ID Parse Error %v\n", err.Error())
+		log.Printf("❌ ID Parse Error %v\n", err.Error())
 	}
 	recording, _ := models.GetRecordingById(id)
 
@@ -67,7 +67,8 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 	newRecording.Id = time.Now().UnixMilli()
 	newRecording.Status = models.Created
 	recording := newRecording.CreateRecording()
-
+	log.Printf("📝 Added %v\n", recording.Id)
+	
 	res, _ := json.Marshal(recording)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
@@ -77,7 +78,7 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 // Scheduler, checks for due recordings and launches them
 // launched on another thread
 func RunScheduling() {
-	log.Println("Starting Scheduler")
+	log.Println("🗓️  Starting Scheduler")
 
 	db := database.GetDB()
 
@@ -86,7 +87,7 @@ func RunScheduling() {
 		db.Where("status=?", models.Created).Find(&newRecordings)
 		for _, rec := range newRecordings {
 			if rec.Time < time.Now().UnixMilli() && !config.IsRecording(){
-				log.Printf("Launching %v\n", rec.Id)
+				log.Printf("⚡ Launching %v\n", rec.Id)
 				rec.Status = models.Running
 				rec.Update()
 				config.Recording()
@@ -104,7 +105,7 @@ func RunScheduling() {
 // TODO: do it for real
 func RunProcess(rec models.Recording) {
 	time.Sleep(10 * time.Second)
-	log.Printf("Finishing %v\n", rec.Id)
+	log.Printf("✅ Finishing %v\n", rec.Id)
 	// update recording status
 	rec.Status = models.Finished
 	rec.Update()

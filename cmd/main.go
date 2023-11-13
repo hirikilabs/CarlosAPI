@@ -26,7 +26,7 @@ func main() {
 	http.Handle("/", router)
 
 	// launch server
-	log.Printf("CarlosAPI version %s Listening on port %d", conf.Version, conf.Port)
+	log.Printf("📡 CarlosAPI version %s Listening on port %d", conf.Version, conf.Port)
 	addr := fmt.Sprintf("%s:%d", conf.Addr, conf.Port) 
 	log.Fatal(http.ListenAndServe(addr, router))
 }
