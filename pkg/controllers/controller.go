@@ -6,10 +6,12 @@ import (
 	"carlosapi/pkg/models"
 	"carlosapi/pkg/utils"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
 	"github.com/gorilla/mux"
 )
 
@@ -62,8 +64,26 @@ func ClearDatabase(writer http.ResponseWriter, request *http.Request) {
 // creates a new recording
 // TODO: validate fields
 func CreateRecording(writer http.ResponseWriter, request *http.Request) {
+	// parse JSON
 	newRecording := &models.Recording{}
-	utils.ParseBody(request, newRecording)
+	err := utils.ParseBody(request, newRecording)
+	if err != nil {
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusBadRequest)
+		res := fmt.Sprintf("'error' = '%v'}", err.Error())
+		writer.Write([]byte(res))
+		return
+	}
+	// check fields
+	err = newRecording.Check()
+	if err != nil {
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusBadRequest)
+		res := fmt.Sprintf("'error' = '%v'}", err.Error())
+		writer.Write([]byte(res))
+		return		
+	}
+	// ok, create recording
 	newRecording.Id = time.Now().UnixMilli()
 	newRecording.Status = models.Created
 	recording := newRecording.CreateRecording()
