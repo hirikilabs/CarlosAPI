@@ -3,7 +3,9 @@ package models
 import(
 	"carlosapi/pkg/database"
 	"carlosapi/pkg/config"
+	"fmt"
 	"gorm.io/gorm"
+	"time"
 )
 
 // strings that represent the status of the recordings
@@ -54,6 +56,15 @@ func (r *Recording) CreateRecording() *Recording {
 func (r *Recording) Update() *Recording {
 	db.Save(&r)
 	return r
+}
+
+// check recording fields
+func (r* Recording) Check() error {
+	// check time
+	if r.Time <= time.Now().UnixMilli() {
+		return fmt.Errorf("Time is in the past")
+	}
+	return nil
 }
 
 // clear all the data in the database
