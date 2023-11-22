@@ -29,10 +29,11 @@ type Recording struct {
 	Gain		float32	`json:"gain"`
 	RecTime		int		`json:"rec_time"`
 	WaitTime	int		`json:"wait_time"`
-	AzStart		float32 `json:"az_start"`
-	AzEnd		float32 `json:"az_end"`
-	ElStart		float32 `json:"el_start"`
-	ElEnd		float32 `json:"el_end"`
+	Coords      string  `json:"coords"`
+	AzRange		int     `json:"az_range"`
+	AzStep		int     `json:"az_step"`
+	ElRange		int     `json:"el_range"`
+	ElStep		int     `json:"el_step"`
 	Path		string	`json:"path"`
 	Status		RecordStatus `json:"status"`
 }
