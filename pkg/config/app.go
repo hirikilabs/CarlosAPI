@@ -10,9 +10,10 @@ const (
 )
 
 type Config struct {
-	Addr		string
-	Port		int
-	Database	string
+	Addr		string  `toml:"addr"`
+	Port		int     `toml:"port"`
+	RecordPath  string  `toml:"record_path"`
+	Database	string  `toml:"database"`
 	Version     string
 }
 
