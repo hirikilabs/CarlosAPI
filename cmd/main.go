@@ -1,14 +1,16 @@
 package main
 
 import (
-	"carlosapi/pkg/routes"
+	"carlosapi/pkg/color"
 	"carlosapi/pkg/config"
 	"carlosapi/pkg/controllers"
+	"carlosapi/pkg/routes"
 	"fmt"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -18,9 +20,6 @@ func main() {
 	// init
 	config.NoRecording()
 
-	// run sheduler on another thread
-	go controllers.RunScheduling()
-	
 	// create HTTP routes
 	router := mux.NewRouter()
 	routes.RegisterRoutes(router)
@@ -37,8 +36,12 @@ ___/\/\/\/\/\__/\/\____/\/\__/\/\____/\/\__/\/\/\/\/\____/\/\/\/\____/\/\/\/\/\_
           Cooperative Amateur RadioTelescope Listening Outer Space
 
 `	
-	fmt.Fprintf(os.Stderr, logo)
-	log.Printf("📡 CarlosAPI version %s Listening on port %d", conf.Version, conf.Port)
+	fmt.Fprintf(os.Stderr, color.Cyan + logo + color.Reset)
+	log.Printf("📡 " + color.Green + "CarlosAPI version " + color.Purple + "%s" + color.Green + " listening on port " + color.Red + "%d" + color.Reset, conf.Version, conf.Port)
+
+	// run sheduler on another thread
+	go controllers.RunScheduling()
+
 	addr := fmt.Sprintf("%s:%d", conf.Addr, conf.Port) 
 	log.Fatal(http.ListenAndServe(addr, router))
 }

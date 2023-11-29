@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"carlosapi/pkg/color"
 	"carlosapi/pkg/config"
 	"carlosapi/pkg/database"
 	"carlosapi/pkg/models"
@@ -87,7 +88,7 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 	newRecording.Id = time.Now().UnixMilli()
 	newRecording.Status = models.Created
 	recording := newRecording.CreateRecording()
-	log.Printf("📝 Added %v\n", recording.Id)
+	log.Printf("📝 " + color.Blue + "Added %v\n" + color.Reset, recording.Id)
 	
 	res, _ := json.Marshal(recording)
 	writer.Header().Set("Content-Type", "application/json")
@@ -98,7 +99,7 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 // Scheduler, checks for due recordings and launches them
 // launched on another thread
 func RunScheduling() {
-	log.Println("🗓️  Starting Scheduler")
+	log.Println("🗓️ " + color.Red + "Starting Scheduler" + color.Reset)
 
 	db := database.GetDB()
 
@@ -107,7 +108,7 @@ func RunScheduling() {
 		db.Where("status=?", models.Created).Find(&newRecordings)
 		for _, rec := range newRecordings {
 			if rec.Time < time.Now().UnixMilli() && !config.IsRecording(){
-				log.Printf("⚡ Launching %v\n", rec.Id)
+				log.Printf("⚡ " + color.Yellow + "Launching %v\n" + color.Reset, rec.Id)
 				rec.Status = models.Running
 				rec.Update()
 				config.Recording()
