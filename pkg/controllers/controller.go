@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os/exec"
 	"strconv"
 	"time"
 
@@ -125,7 +126,17 @@ func RunScheduling() {
 // launched on another thread
 // TODO: do it for real
 func RunProcess(rec models.Recording) {
-	time.Sleep(10 * time.Second)
+	//time.Sleep(10 * time.Second)
+	cmd := fmt.Sprintf("python3 /home/pi/CARLOS/scan_sky.py --host=172.16.30.11 --port=4533" +
+		" --sample-rate=%v --freq=%v --gain=%v --rec-time=%v --wait-time=%v --coords=%v" +
+		" --azim-range=%v --elev-range=%v --azim-step=%v --elev-step=%v",
+		rec.SampleRate, rec.Frequency, rec.Gain, rec.RecTime,
+		rec.WaitTime, rec.Coords, rec.AzRange, rec.ElRange,
+		rec.AzStep, rec.AzRange)
+	_, err := exec.Command(cmd).Output()
+    if err != nil {
+        log.Fatal(err)
+    }
 	log.Printf("✅ Finishing %v\n", rec.Id)
 	// update recording status
 	rec.Status = models.Finished
