@@ -77,8 +77,8 @@ func (r* Recording) Check() error {
 	if r.WaitTime < 0 {
 		return fmt.Errorf("Wait time can't be negative")
 	}
-	if r.AzRange <= 0 || r.AzStep <= 0 || r.ElStep <= 0 || r.ElRange <= 0 {
-		return fmt.Errorf("Movement ranges and steps can't be zero or negative")
+	if r.AzRange < 0 || r.AzStep < 0 || r.ElStep < 0 || r.ElRange < 0 {
+		return fmt.Errorf("Movement ranges and steps can't be negative")
 	}
 	
 	return nil
