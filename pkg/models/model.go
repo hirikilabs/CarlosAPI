@@ -34,7 +34,7 @@ type Recording struct {
 	AzStep		int     `json:"az_step"`
 	ElRange		int     `json:"el_range"`
 	ElStep		int     `json:"el_step"`
-	Path		string	`json:"path"`
+	CalcTime    int64   `json:"calc_time"`
 	Status		RecordStatus `json:"status"`
 }
 
@@ -59,12 +59,28 @@ func (r *Recording) Update() *Recording {
 	return r
 }
 
+// calculate estimated time for the recording
+func (r* Recording) EstimateTime() {
+	// (record time * wait ) * number of points * 1000 (milliseconds)
+	r.CalcTime = (int64(r.RecTime) * int64(r.WaitTime)) * (int64(r.AzRange) / int64(r.AzStep)) * (int64(r.ElRange) / int64(r.ElStep)) * 1000
+}
+
 // check recording fields
 func (r* Recording) Check() error {
 	// check time
 	if r.Time <= time.Now().UnixMilli() {
 		return fmt.Errorf("Time is in the past")
 	}
+	if r.RecTime < 1 {
+		return fmt.Errorf("Record time too short")
+	}
+	if r.WaitTime < 0 {
+		return fmt.Errorf("Wait time can't be negative")
+	}
+	if r.AzRange <= 0 || r.AzStep <= 0 || r.ElStep <= 0 || r.ElRange <= 0 {
+		return fmt.Errorf("Movement ranges and steps can't be zero or negative")
+	}
+	
 	return nil
 }
 
