@@ -100,7 +100,7 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 // Scheduler, checks for due recordings and launches them
 // launched on another thread
 func RunScheduling() {
-	log.Println("🗓️" + color.Red + " Starting Scheduler" + color.Reset)
+	log.Println("⏰" + color.Red + " Starting Scheduler" + color.Reset)
 
 	db := database.GetDB()
 
@@ -126,7 +126,7 @@ func RunScheduling() {
 // launched on another thread
 // TODO: do it for real
 func RunProcess(rec models.Recording) {
-	//time.Sleep(10 * time.Second)
+
 	conf := config.GetConfig()
 	
 	args := fmt.Sprintf(conf.RecordCmd,
