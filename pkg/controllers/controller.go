@@ -133,9 +133,10 @@ func RunProcess(rec models.Recording) {
 		rec.SampleRate, rec.Frequency, rec.Gain, rec.RecTime,
 		rec.WaitTime, rec.Coords, rec.AzRange, rec.ElRange,
 		rec.AzStep, rec.AzRange, conf.RecordPath + strconv.FormatInt(rec.Id, 10))
-	_, err := exec.Command(conf.RecordCmd, args).Output()
+	out, err := exec.Command(conf.RecordCmd, args).Output()
     if err != nil {
-        log.Fatal(err)
+		log.Println("❌ Error running record command")
+        log.Fatal(err.Error() + "\n\n" + string(out))
     }
 	log.Printf("✅ Finishing %v\n", rec.Id)
 	// update recording status
