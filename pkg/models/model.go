@@ -38,6 +38,7 @@ type Recording struct {
 	Status		RecordStatus `json:"status"`
 }
 
+type Notification struct {}
 
 func init() {
 	// connect to the database and create the tables if needed

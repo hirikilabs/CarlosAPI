@@ -17,6 +17,16 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var updateChannel chan models.Notification
+
+func init() {
+	updateChannel = make(chan models.Notification)
+}
+
+func GetChannel() chan models.Notification {
+	return updateChannel
+}
+
 // "/" return configuration parameters
 func Root(writer http.ResponseWriter, request *http.Request) {
 	conf := config.GetConfig()
@@ -89,6 +99,11 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 	newRecording.Id = time.Now().UnixMilli()
 	newRecording.Status = models.Created
 	recording := newRecording.CreateRecording()
+
+	// send notification
+	updateChannel <- models.Notification{}
+
+	// ok
 	log.Printf("📝" + color.Blue + " Added %v\n" + color.Reset, recording.Id)
 	
 	res, _ := json.Marshal(recording)
@@ -97,16 +112,73 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
+
+// Downloads file for Id
+func DownloadId(writer http.ResponseWriter, request *http.Request) {
+	// get config for paths
+	conf := config.GetConfig()
+
+	// check Id
+	vars := mux.Vars(request)
+	varid := vars["id"]
+	id, err := strconv.ParseInt(varid, 0, 0)
+	if err != nil {
+		log.Printf("❌ ID Parse Error %v\n", err.Error())
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusBadRequest)
+		writer.Write([]byte("{'error' = 'Error parsing ID'}"))
+		return
+	}
+
+	// get from database to check
+	recording, _ := models.GetRecordingById(id)
+
+	if recording == nil {
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusBadRequest)
+		writer.Write([]byte("{'error' = 'No recording with requested ID'}"))
+		return
+	}
+	if recording.Status != models.Finished {
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusBadRequest)
+		writer.Write([]byte("{'error' = 'Recording not done yet'}"))
+		return
+	}
+
+	// ok, send file
+	http.ServeFile(writer, request, conf.RecordPath + varid + ".iq")
+}
+
 // Scheduler, checks for due recordings and launches them
 // launched on another thread
 func RunScheduling() {
 	log.Println("⏰" + color.Red + " Starting Scheduler" + color.Reset)
 
+	// need to update?
+	updateDatabase := true
+
+	// get db
 	db := database.GetDB()
 
+	var newRecordings []models.Recording
+	
 	for {
-		var newRecordings []models.Recording
-		db.Where("status=?", models.Created).Find(&newRecordings)
+		// check channel
+		select {
+		case <- updateChannel:
+			// get from database again
+			updateDatabase = true
+		default:
+			// nothing
+		}
+
+		// need to update?
+		if updateDatabase {
+			db.Where("status=?", models.Created).Find(&newRecordings)
+			updateDatabase = false
+		}
+		
 		for _, rec := range newRecordings {
 			if rec.Time < time.Now().UnixMilli() && !config.IsRecording(){
 				log.Printf("⚡" + color.Yellow + " Launching %v\n" + color.Reset, rec.Id)
@@ -114,10 +186,12 @@ func RunScheduling() {
 				rec.Update()
 				config.Recording()
 				go RunProcess(rec)
+				// we need to update to see the change of a finished recording
+				updateDatabase = true
 				break
 			}
 		}
-		time.Sleep(1 * time.Minute)
+		time.Sleep(1 * time.Second)
 	}
 }
 
@@ -132,11 +206,11 @@ func RunProcess(rec models.Recording) {
 	args := fmt.Sprintf(conf.RecordCmd,
 		rec.SampleRate, rec.Frequency, rec.Gain, rec.RecTime,
 		rec.WaitTime, rec.Coords, rec.AzRange, rec.ElRange,
-		rec.AzStep, rec.AzRange, conf.RecordPath + strconv.FormatInt(rec.Id, 10))
+		rec.AzStep, rec.AzRange, conf.RecordPath + strconv.FormatInt(rec.Id, 10) + ".iq")
 	out, err := exec.Command(conf.RecordCmd, args).Output()
     if err != nil {
 		log.Println("❌ Error running record command")
-        log.Fatal(err.Error() + "\n\n" + string(out))
+        log.Println(err.Error() + "\n\n" + string(out))
     }
 	log.Printf("✅ Finishing %v\n", rec.Id)
 	// update recording status
