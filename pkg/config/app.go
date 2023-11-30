@@ -13,6 +13,7 @@ type Config struct {
 	Addr		string  `toml:"addr"`
 	Port		int     `toml:"port"`
 	RecordPath  string  `toml:"record_path"`
+	RecordCmd   string  `toml:"record_cmd"`
 	Database	string  `toml:"database"`
 	Version     string
 }
