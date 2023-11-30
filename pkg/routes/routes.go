@@ -11,4 +11,5 @@ func RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/status", controllers.GetStatus).Methods("GET")
 	router.HandleFunc("/status/{id}", controllers.GetStatusId).Methods("GET")
 	router.HandleFunc("/clear", controllers.ClearDatabase).Methods("GET")
+	router.HandleFunc("/download/{id}", controllers.DownloadId).Methods("GET") 
 }
