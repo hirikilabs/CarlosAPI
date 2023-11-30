@@ -14,6 +14,7 @@ type Config struct {
 	Port		int     `toml:"port"`
 	RecordPath  string  `toml:"record_path"`
 	RecordCmd   string  `toml:"record_cmd"`
+	RecordArgs  string  `toml:"record_args"`
 	Database	string  `toml:"database"`
 	Version     string
 }

@@ -129,11 +129,11 @@ func RunProcess(rec models.Recording) {
 	//time.Sleep(10 * time.Second)
 	conf := config.GetConfig()
 	
-	cmd := fmt.Sprintf(conf.RecordCmd,
+	args := fmt.Sprintf(conf.RecordCmd,
 		rec.SampleRate, rec.Frequency, rec.Gain, rec.RecTime,
 		rec.WaitTime, rec.Coords, rec.AzRange, rec.ElRange,
 		rec.AzStep, rec.AzRange, conf.RecordPath + strconv.FormatInt(rec.Id, 10))
-	_, err := exec.Command(cmd).Output()
+	_, err := exec.Command(conf.RecordCmd, args).Output()
     if err != nil {
         log.Fatal(err)
     }
