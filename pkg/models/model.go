@@ -102,6 +102,6 @@ func GetRecordings() []Recording {
 // Get a recording by it's ID
 func GetRecordingById(Id int64) (*Recording, *gorm.DB) {
 	var getRecording Recording
-	db := db.Where("id=?", Id).Find(&getRecording)
-	return &getRecording, db
+	result := db.Where("id=?", Id).First(&getRecording)
+	return &getRecording, result
 }

@@ -54,9 +54,19 @@ func GetStatusId(writer http.ResponseWriter, request *http.Request) {
 	id, err := strconv.ParseInt(varid, 0, 0)
 	if err != nil {
 		log.Printf("❌ ID Parse Error %v\n", err.Error())
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusBadRequest)
+		writer.Write([]byte(`{"error": "Problem parsing ID"}`))
+		return
 	}
-	recording, _ := models.GetRecordingById(id)
-
+	recording, result := models.GetRecordingById(id)
+	if result.Error != nil {
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusNotFound)
+		writer.Write([]byte(`{"error": "No recording with that ID"}`))
+		return
+	}
+	
 	res, _ := json.Marshal(recording)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
@@ -82,7 +92,7 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		writer.Header().Set("Content-Type", "application/json")
 		writer.WriteHeader(http.StatusBadRequest)
-		res := fmt.Sprintf("'error' = '%v'}", err.Error())
+		res := fmt.Sprintf("{'error' = '%v'}", err.Error())
 		writer.Write([]byte(res))
 		return
 	}
@@ -91,7 +101,7 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		writer.Header().Set("Content-Type", "application/json")
 		writer.WriteHeader(http.StatusBadRequest)
-		res := fmt.Sprintf("'error' = '%v'}", err.Error())
+		res := fmt.Sprintf("{'error' = '%v'}", err.Error())
 		writer.Write([]byte(res))
 		return		
 	}
@@ -126,23 +136,23 @@ func DownloadId(writer http.ResponseWriter, request *http.Request) {
 		log.Printf("❌ ID Parse Error %v\n", err.Error())
 		writer.Header().Set("Content-Type", "application/json")
 		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write([]byte("{'error' = 'Error parsing ID'}"))
+		writer.Write([]byte(`{"error": "Error parsing ID"}`))
 		return
 	}
 
 	// get from database to check
-	recording, _ := models.GetRecordingById(id)
+	recording, result := models.GetRecordingById(id)
 
-	if recording == nil {
+	if result.Error != nil {
 		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write([]byte("{'error' = 'No recording with requested ID'}"))
+		writer.WriteHeader(http.StatusNotFound)
+		writer.Write([]byte(`{"error": "No recording with requested ID"}`))
 		return
 	}
 	if recording.Status != models.Finished {
 		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write([]byte("{'error' = 'Recording not done yet'}"))
+		writer.WriteHeader(http.StatusLocked)
+		writer.Write([]byte(`{"error": "Recording not done yet"}`))
 		return
 	}
 
@@ -182,7 +192,7 @@ func RunScheduling() {
 		}
 		
 		for _, rec := range newRecordings {
-			if rec.Time < time.Now().UnixMilli() && !config.IsRecording(){
+			if rec.Time < time.Now().UnixMilli() && !config.IsRecording() {
 				log.Printf("⚡" + color.Yellow + " Launching %v\n" + color.Reset, rec.Id)
 				rec.Status = models.Running
 				rec.Update()
