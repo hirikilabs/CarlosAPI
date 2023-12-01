@@ -161,6 +161,7 @@ func RunScheduling() {
 	// get db
 	db := database.GetDB()
 
+	// recordings array
 	var newRecordings []models.Recording
 	
 	for {
@@ -175,6 +176,7 @@ func RunScheduling() {
 
 		// need to update?
 		if updateDatabase {
+			// get requests not done yet
 			db.Where("status=?", models.Created).Find(&newRecordings)
 			updateDatabase = false
 		}
