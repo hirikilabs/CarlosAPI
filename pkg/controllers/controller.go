@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os/exec"
+	"os"
 	"strconv"
 	"time"
 
@@ -212,18 +212,35 @@ func RunScheduling() {
 // launched on another thread
 // TODO: do it for real
 func RunProcess(rec models.Recording) {
-
 	conf := config.GetConfig()
 	
 	args := fmt.Sprintf(conf.RecordCmd,
 		rec.SampleRate, rec.Frequency, rec.Gain, rec.RecTime,
-		rec.WaitTime, rec.Coords, rec.AzRange, rec.ElRange,
-		rec.AzStep, rec.AzRange, conf.RecordPath + strconv.FormatInt(rec.Id, 10) + ".iq")
-	out, err := exec.Command(conf.RecordCmd, args).Output()
-    if err != nil {
-		log.Println("❌ Error running record command")
-        log.Println(err.Error() + "\n\n" + string(out))
-    }
+		rec.WaitTime, rec.Az, rec.El, rec.AzRange, rec.ElRange,
+		rec.AzStep, rec.ElStep, conf.RecordPath + strconv.FormatInt(rec.Id, 10) + ".iq")
+
+	log.Println("Args: ", args)
+	
+	// create output dir
+	err := os.Mkdir(strconv.FormatInt(rec.Id, 10), 0755)
+	if err != nil && !os.IsExist(err) {
+		log.Println("❌ Error creating output directory")
+		log.Println(err.Error())
+	}
+
+
+	// ranges
+	for az := rec.Az - rec.AzRange/2; az <= rec.Az + rec.AzRange/2; az += rec.AzStep {
+		for el := rec.El - rec.ElRange/2; el <= rec.El + rec.ElRange/2; el += rec.ElStep {
+			log.Printf("🔴 Recording: (%3.1f, %3.1f)\n", az, el) 
+		}
+	}
+	
+	// out, err := exec.Command(conf.RecordCmd, args).Output()
+    // if err != nil {
+	// 	log.Println("❌ Error running record command")
+    //     log.Println(err.Error() + "\n\n" + string(out))
+    // }
 	log.Printf("✅ Finishing %v\n", rec.Id)
 	// update recording status
 	rec.Status = models.Finished

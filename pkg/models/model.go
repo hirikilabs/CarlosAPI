@@ -29,11 +29,12 @@ type Recording struct {
 	Gain		float32	`json:"gain"`
 	RecTime		int		`json:"rec_time"`
 	WaitTime	int		`json:"wait_time"`
-	Coords      string  `json:"coords"`
-	AzRange		int     `json:"az_range"`
-	AzStep		int     `json:"az_step"`
-	ElRange		int     `json:"el_range"`
-	ElStep		int     `json:"el_step"`
+	Az          float32 `json:"az"`
+	El          float32 `json:"el"`
+	AzRange		float32 `json:"az_range"`
+	AzStep		float32 `json:"az_step"`
+	ElRange		float32 `json:"el_range"`
+	ElStep		float32 `json:"el_step"`
 	CalcTime    int64   `json:"calc_time"`
 	Status		RecordStatus `json:"status"`
 }
@@ -63,7 +64,7 @@ func (r *Recording) Update() *Recording {
 // calculate estimated time for the recording
 func (r* Recording) EstimateTime() {
 	// (record time * wait ) * number of points * 1000 (milliseconds)
-	r.CalcTime = (int64(r.RecTime) * int64(r.WaitTime)) * (int64(r.AzRange) / int64(r.AzStep)) * (int64(r.ElRange) / int64(r.ElStep)) * 1000
+	r.CalcTime = (int64(r.RecTime) * int64(r.WaitTime)) * int64((r.AzRange / r.AzStep) * (r.ElRange / r.ElStep)) * 1000
 }
 
 // check recording fields
