@@ -24,11 +24,11 @@ type Recording struct {
 	Id			int64	`json:"id"`
 	User		string	`json:"user"`
 	Time		int64	`json:"time"`
-	Frequency	int		`json:"frequency"`
-	SampleRate	int		`json:"sample_rate"`
-	Gain		float32	`json:"gain"`
-	RecTime		int		`json:"rec_time"`
-	WaitTime	int		`json:"wait_time"`
+	Frequency	int 	`json:"frequency"`
+	SampleRate	int 	`json:"sample_rate"`
+	Gain		int 	`json:"gain"`
+	RecTime		int64	`json:"rec_time"`
+	WaitTime	int64	`json:"wait_time"`
 	Az          float32 `json:"az"`
 	El          float32 `json:"el"`
 	AzRange		float32 `json:"az_range"`

@@ -6,6 +6,7 @@ import (
 	"carlosapi/pkg/database"
 	"carlosapi/pkg/models"
 	"carlosapi/pkg/utils"
+	"carlosapi/pkg/sdrcarlos"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -157,13 +158,13 @@ func DownloadId(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// ok, send file
-	http.ServeFile(writer, request, conf.RecordPath + varid + ".iq")
+	http.ServeFile(writer, request, conf.RecordPath + varid + ".tar.gz")
 }
 
 // Scheduler, checks for due recordings and launches them
 // launched on another thread
 func RunScheduling() {
-	log.Println("⏰" + color.Red + " Starting Scheduler" + color.Reset)
+	log.Println("⏰" + color.Yellow + " Starting Scheduler" + color.Reset)
 
 	// need to update?
 	updateDatabase := true
@@ -208,32 +209,76 @@ func RunScheduling() {
 }
 
 
-// runs the record software
+// runs the recording
 // launched on another thread
 // TODO: do it for real
 func RunProcess(rec models.Recording) {
 	conf := config.GetConfig()
-	
-	args := fmt.Sprintf(conf.RecordCmd,
-		rec.SampleRate, rec.Frequency, rec.Gain, rec.RecTime,
-		rec.WaitTime, rec.Az, rec.El, rec.AzRange, rec.ElRange,
-		rec.AzStep, rec.ElStep, conf.RecordPath + strconv.FormatInt(rec.Id, 10) + ".iq")
 
-	log.Println("Args: ", args)
+	// get and configure SDR
+	carlosDev := &sdrcarlos.SDRCARLOS{Debug: false}
+
+	devices := carlosDev.GetDevices()
+	if devices == nil {
+		log.Println("❌ Can't find any RTLSDR devices")
+	}
+
+	// use first device
+	indexID := 0
+	err := carlosDev.Config(indexID, rec.SampleRate, rec.Frequency, 0, rec.Gain, true)
+	if err != nil {
+		log.Printf("❌ SDR configure failed: %s\n", err.Error())
+	}
+	
+	// args := fmt.Sprintf(conf.RecordCmd,
+	// 	rec.SampleRate, rec.Frequency, rec.Gain, rec.RecTime,
+	// 	rec.WaitTime, rec.Az, rec.El, rec.AzRange, rec.ElRange,
+	// 	rec.AzStep, rec.ElStep, conf.RecordPath + strconv.FormatInt(rec.Id, 10) + ".iq")
+
+	// log.Println("Args: ", args)
 	
 	// create output dir
-	err := os.Mkdir(strconv.FormatInt(rec.Id, 10), 0755)
+	err = os.MkdirAll(conf.RecordPath + strconv.FormatInt(rec.Id, 10), 0755)
 	if err != nil && !os.IsExist(err) {
 		log.Println("❌ Error creating output directory")
 		log.Println(err.Error())
 	}
 
+	// no errors and SDR detected?
+	if err == nil && devices != nil {
+		// move rotor to starting point
+		// TODO
+		
+		// ranges
+		for az := rec.Az - rec.AzRange/2; az <= rec.Az + rec.AzRange/2; az += rec.AzStep {
+			for el := rec.El - rec.ElRange/2; el <= rec.El + rec.ElRange/2; el += rec.ElStep {
+				// TODO move rotor
+				
+				log.Printf("🔴 Recording: (%3.1f, %3.1f)\n", az, el)
 
-	// ranges
-	for az := rec.Az - rec.AzRange/2; az <= rec.Az + rec.AzRange/2; az += rec.AzStep {
-		for el := rec.El - rec.ElRange/2; el <= rec.El + rec.ElRange/2; el += rec.ElStep {
-			log.Printf("🔴 Recording: (%3.1f, %3.1f)\n", az, el) 
+				// record
+				carlosDev.ReadTime(fmt.Sprintf("%s/%d/%d-%3.1f-%3.1f.iq",
+					conf.RecordPath, rec.Id, rec.Id, az, el), rec.RecTime)
+			}
 		}
+		
+		// create compressed archive
+		log.Printf("🗜️ Creating compressed archive.\n")
+		dirname := fmt.Sprintf("%s/%d/", conf.RecordPath, rec.Id)
+		directory, err := os.Open(dirname)
+		if err != nil {
+			log.Println("❌ Error getting output directory")
+		}
+		defer directory.Close()
+		files, err := directory.Readdirnames(0)
+		if err != nil {
+			log.Println("❌ Error listing data files")
+		}
+		err = utils.CreateArchive(fmt.Sprintf("%s/%d.tar.gz", conf.RecordPath, rec.Id), dirname, files)
+		if err != nil {
+			log.Printf("❌ Error creating compressed archive: %v", err)
+		}
+
 	}
 	
 	// out, err := exec.Command(conf.RecordCmd, args).Output()
