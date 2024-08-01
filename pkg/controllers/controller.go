@@ -157,7 +157,8 @@ func DownloadId(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	// ok, send file
+	// ok, send file (add header for filename)
+	writer.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", varid + ".tar.gz"))
 	http.ServeFile(writer, request, conf.RecordPath + varid + ".tar.gz")
 }
 
@@ -263,8 +264,8 @@ func RunProcess(rec models.Recording) {
 		}
 		
 		// create compressed archive
-		log.Printf("🗜️ Creating compressed archive.\n")
-		dirname := fmt.Sprintf("%s/%d/", conf.RecordPath, rec.Id)
+		log.Printf("🗜️  Creating compressed archive.\n")
+		dirname := fmt.Sprintf("%s%d/", conf.RecordPath, rec.Id)
 		directory, err := os.Open(dirname)
 		if err != nil {
 			log.Println("❌ Error getting output directory")
@@ -279,6 +280,12 @@ func RunProcess(rec models.Recording) {
 			log.Printf("❌ Error creating compressed archive: %v", err)
 		}
 
+		// remove uncompressed data
+		log.Printf("🗑️  Removing uncompressed data.\n")
+		err = os.RemoveAll(dirname)
+		if err != nil {
+			log.Printf("❌ Error deleting uncompressed data: %v", err)
+		}
 	}
 	
 	// out, err := exec.Command(conf.RecordCmd, args).Output()

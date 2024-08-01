@@ -44,7 +44,7 @@ func CreateArchive(name string, directory string, files []string) error {
 
 	// Iterate over files and add them to the tar archive
 	for _, file := range files {
-		err := AddToArchive(tw, directory + "/" + file)
+		err := AddToArchive(tw, directory + file)
 		if err != nil {
 			return err
 		}
