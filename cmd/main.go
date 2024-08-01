@@ -37,7 +37,7 @@ ___/\/\/\/\/\__/\/\____/\/\__/\/\____/\/\__/\/\/\/\/\____/\/\/\/\____/\/\/\/\/\_
 
 `	
 	fmt.Fprintf(os.Stderr, color.Cyan + logo + color.Reset)
-	log.Printf("📡 " + color.Green + "CarlosAPI version " + color.Purple + "%s" + color.Green + " listening on port " + color.Red + "%d" + color.Reset, conf.Version, conf.Port)
+	log.Printf("📡 " + color.Green + "CarlosAPI version " + color.Purple + "%s" + color.Green + " listening on port " + color.Yellow + "%d" + color.Reset, conf.Version, conf.Port)
 
 	// run sheduler on another thread
 	go controllers.RunScheduling()
