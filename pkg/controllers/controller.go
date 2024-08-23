@@ -258,12 +258,26 @@ func RunProcess(rec models.Recording) {
 	// no errors and SDR detected?
 	if err == nil && devices != nil {
 		// move rotor to starting point
-		// TODO
+		log.Printf("📡 Moving rotor to start point...\n")
+		
+		err:= rot.SetPos(rec.Az - rec.AzRange/2, rec.El - rec.ElRange/2)
+		if err != nil {
+			log.Printf("❌ Error moving rotor, %s\n", err.Error())
+		}
+
+		// wait
+		for !rot.InPos(rec.Az - rec.AzRange/2, rec.El - rec.ElRange/2) {
+			time.Sleep(1 * time.Second)
+		}
 		
 		// ranges
 		for az := rec.Az - rec.AzRange/2; az <= rec.Az + rec.AzRange/2; az += rec.AzStep {
 			for el := rec.El - rec.ElRange/2; el <= rec.El + rec.ElRange/2; el += rec.ElStep {
-				// TODO move rotor
+				// move rotor
+				err := rot.SetPos(az, el);
+				if err != nil {
+					log.Printf("❌ Error moving rotor, %s\n", err.Error())
+				}
 				
 				log.Printf("🔴 Recording: (%3.1f, %3.1f)\n", az, el)
 
