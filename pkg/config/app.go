@@ -16,6 +16,8 @@ type Config struct {
 	RecordCmd   string  `toml:"record_cmd"`
 	RecordArgs  string  `toml:"record_args"`
 	Database	string  `toml:"database"`
+	RotorHost   string  `toml:"rotor_host"`
+	RotorPort   string  `toml:"rotor_port"`
 	Version     string
 }
 

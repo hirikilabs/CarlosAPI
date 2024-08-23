@@ -1,0 +1,9 @@
+addr = "0.0.0.0"
+port = 8080
+database = "carlos.db"
+record_path = "data/"
+record_cmd = "python3"
+record_args = "/home/pi/radio-CARLOS/scan_sky.py --host=172.16.30.11 --port=4533 --sample-rate=%v --freq=%v --gain=%v --rec-time=%v --wait-time=%v --coords=%v --azim-range=%v --elev-range=%v --azim-step=%v --elev-step=%v"
+rotor_host =  "172.16.30.11"
+rotor_port =  "4533"
+#record_args = "/home/pi/radio-CARLOS/scan_sky.py --host=172.16.30.11 --port=4533 --sample-rate=%v --freq=%v --gain=%v --rec-time=%v --wait-time=%v --coords=%v --azim-range=%v --elev-range=%v --azim-step=%v --elev-step=%v --output=%v"
