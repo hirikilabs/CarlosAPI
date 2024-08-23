@@ -104,6 +104,19 @@ func (r *RotCtl) SetPos(az float64, el float64) error {
 }
 
 
+func (r *RotCtl) InPos(az float64, el float64) bool {
+	posaz, posel, err := r.GetPos()
+	if err != nil {
+		return false
+	}
+	
+	if (posaz == az || posaz - 360 == az || posaz + 360 == az) && posel == el {
+		return true
+	} else {
+		return false
+	}
+}
+
 
 func ParsePos(data []byte) (float64, float64, error) {
 	lines := bytes.Split(data, []byte("\n"))
@@ -120,3 +133,4 @@ func ParsePos(data []byte) (float64, float64, error) {
 	return az, el, nil
 	
 }
+

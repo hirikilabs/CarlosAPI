@@ -72,3 +72,27 @@ func TestSetPos(t *testing.T) {
 	}
 }
 
+func TestInPos(t *testing.T) {
+	rot := NewRotCtl("172.16.30.11", "4533")
+	err := rot.Connect()
+	if err != nil {
+		t.Errorf("Error connecting to rotor %v", err.Error())
+	}
+
+
+	err = rot.SetPos(10.0, 10.0)
+	if err != nil {
+		t.Errorf("Error setting rotor position %v", err.Error())
+	}
+	
+	if !rot.InPos(10.0, 10.0) {
+		t.Errorf("Rotor not in position")
+	}
+
+	
+	err = rot.Disconnect()
+	if err != nil {
+		t.Errorf("Error disconnecting from rotor %v", err.Error())
+	}
+}
+
