@@ -7,6 +7,7 @@ import (
 	"carlosapi/pkg/models"
 	"carlosapi/pkg/utils"
 	"carlosapi/pkg/sdrcarlos"
+	"carlosapi/pkg/rotor"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -108,6 +109,7 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 	}
 	// ok, create recording
 	newRecording.Id = time.Now().UnixMilli()
+	newRecording.EstimateTime()
 	newRecording.Status = models.Created
 	recording := newRecording.CreateRecording()
 
@@ -230,6 +232,14 @@ func RunProcess(rec models.Recording) {
 	if err != nil {
 		log.Printf("❌ SDR configure failed: %s\n", err.Error())
 	}
+
+
+	// connect to rotor
+	rot := rotor.NewRotCtl(conf.RotorHost, conf.RotorPort)
+	err = rot.Connect()
+	if (err != nil) {
+		log.Printf("❌ Can't connect to rotor: %s\n", err.Error())
+	}
 	
 	// args := fmt.Sprintf(conf.RecordCmd,
 	// 	rec.SampleRate, rec.Frequency, rec.Gain, rec.RecTime,
@@ -262,6 +272,11 @@ func RunProcess(rec models.Recording) {
 					conf.RecordPath, rec.Id, rec.Id, az, el), rec.RecTime)
 			}
 		}
+
+		// finished recording
+		rec.Status = models.Recorded
+		rec.Update()
+		config.NoRecording()
 		
 		// create compressed archive
 		log.Printf("🗜️  Creating compressed archive.\n")
@@ -287,6 +302,9 @@ func RunProcess(rec models.Recording) {
 			log.Printf("❌ Error deleting uncompressed data: %v", err)
 		}
 	}
+
+	// close rotor connection
+	rot.Disconnect()
 	
 	// out, err := exec.Command(conf.RecordCmd, args).Output()
     // if err != nil {
@@ -294,9 +312,7 @@ func RunProcess(rec models.Recording) {
     //     log.Println(err.Error() + "\n\n" + string(out))
     // }
 	log.Printf("✅ Finishing %v\n", rec.Id)
-	// update recording status
+	// update status
 	rec.Status = models.Finished
 	rec.Update()
-	// not recording anymore
-	config.NoRecording()
 }
