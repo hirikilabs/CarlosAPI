@@ -12,6 +12,7 @@ import(
 const(
 	Created = "Created"
 	Running = "Running"
+	Recorded = "Recorded"
 	Finished = "Finished"
 )
 
@@ -63,8 +64,8 @@ func (r *Recording) Update() *Recording {
 
 // calculate estimated time for the recording
 func (r* Recording) EstimateTime() {
-	// (record time * wait ) * number of points * 1000 (milliseconds)
-	r.CalcTime = (int64(r.RecTime) * int64(r.WaitTime)) * int64((r.AzRange / r.AzStep) * (r.ElRange / r.ElStep)) * 1000
+	// (record time + wait time) * number of points
+	r.CalcTime = (int64(r.RecTime) + int64(r.WaitTime)) * int64((r.AzRange / r.AzStep) * (r.ElRange / r.ElStep))
 }
 
 // check recording fields
