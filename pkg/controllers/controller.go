@@ -269,6 +269,7 @@ func RunProcess(rec models.Recording) {
 		for !rot.InPos(rec.Az - rec.AzRange/2, rec.El - rec.ElRange/2) {
 			time.Sleep(1 * time.Second)
 		}
+		log.Println("📍 Rotor in place.")
 		
 		// ranges
 		for az := rec.Az - rec.AzRange/2; az <= rec.Az + rec.AzRange/2; az += rec.AzStep {
@@ -278,6 +279,10 @@ func RunProcess(rec models.Recording) {
 				if err != nil {
 					log.Printf("❌ Error moving rotor, %s\n", err.Error())
 				}
+
+				// wait
+				log.Printf("⏳ Waiting...")
+				time.Sleep(time.Duration(rec.WaitTime) *  time.Millisecond)
 				
 				log.Printf("🔴 Recording: (%3.1f, %3.1f)\n", az, el)
 

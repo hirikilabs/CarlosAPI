@@ -22,21 +22,21 @@ type RecordStatus string
 
 type Recording struct {
 	gorm.Model
-	Id			int64	`json:"id"`
+	Id			int64	`json:"id"`            
 	User		string	`json:"user"`
-	Time		int64	`json:"time"`
-	Frequency	int 	`json:"frequency"`
-	SampleRate	int 	`json:"sample_rate"`
-	Gain		int 	`json:"gain"`
-	RecTime		int64	`json:"rec_time"`
-	WaitTime	int64	`json:"wait_time"`
+	Time		int64	`json:"time"`            // unix timestamp
+	Frequency	int 	`json:"frequency"`       // Hz
+	SampleRate	int 	`json:"sample_rate"`     
+	Gain		int 	`json:"gain"`            // integer, real gain/10
+	RecTime		int64	`json:"rec_time"`        // ms
+	WaitTime	int64	`json:"wait_time"`       // ms
 	Az          float64 `json:"az"`
 	El          float64 `json:"el"`
 	AzRange		float64 `json:"az_range"`
 	AzStep		float64 `json:"az_step"`
 	ElRange		float64 `json:"el_range"`
 	ElStep		float64 `json:"el_step"`
-	CalcTime    int64   `json:"calc_time"`
+	CalcTime    int64   `json:"calc_time"`       // ms
 	Status		RecordStatus `json:"status"`
 }
 
