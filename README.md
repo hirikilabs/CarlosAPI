@@ -68,3 +68,34 @@ The request, if valid, will give a JSON answer with the same format but also inc
 * "calc_time": the estimated time the recording will take (milliseconds)
 * "status": a string representing the recording status, it can be "Created", "Recording", "Recorded" or "Finished"
 
+
+## Diagram
+```
+                                        
+                 +---------+              
+                 |  Main   |              
+                 +---------+              
+                      |                   
+       +--------------+-------------+       
+       |              |             |       
+   +--------+   +-----------+    +------+   
+   |  HTTP  |   | Scheduler |<-->|  DB  |
+   +--------+   +-----------+    +------+
+       |              |             ^ ^
+       |              |             | |
+       +----------------------------+ |
+                      |               |
+                +-----------+         |               
+                |   Record  |---------+                   
+                +-----------+                        
+                      |                  
+       +--------------+--------------+       
+       |              |              |       
+   +--------+   +------------+   +-------+   
+   |  SDR   |   | Filesystem |   | Rotor |
+   +--------+   +------------+   +-------+
+```
+                                        
+                                        
+                                        
+                                        
