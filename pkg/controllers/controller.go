@@ -354,6 +354,5 @@ func MakeRequest(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	writer.WriteHeader(http.StatusOK)
 	return
 }
