@@ -9,20 +9,20 @@ import (
 	"sync"
 	"syscall"
 	"time"
-	
+
 	rtl "github.com/jpoirier/gortlsdr"
 )
 
 type RTLDevice struct {
-	Vendor string
+	Vendor  string
 	Product string
-	Serial string
+	Serial  string
 }
 
 // CARLOS holds a device context.
 type SDRCARLOS struct {
-	Dev *rtl.Context
-	Wg  *sync.WaitGroup
+	Dev   *rtl.Context
+	Wg    *sync.WaitGroup
 	Debug bool
 }
 
@@ -36,15 +36,15 @@ func (u *SDRCARLOS) GetDevices() []RTLDevice {
 	} else {
 		for i := 0; i < c; i++ {
 			m, p, s, _ := rtl.GetDeviceUsbStrings(i)
-			dev := RTLDevice {
-				Vendor: m,
+			dev := RTLDevice{
+				Vendor:  m,
 				Product: p,
-				Serial: s,
+				Serial:  s,
 			}
-			devices = append(devices, dev)		
+			devices = append(devices, dev)
 		}
 	}
-	
+
 	return devices
 }
 
@@ -55,14 +55,14 @@ func (u *SDRCARLOS) Read(filename string) {
 	if u.Debug {
 		log.Println("Entered SDRCARLOS read() ...")
 	}
-	
+
 	// create file
-    f, err := os.Create(filename)
-    if err != nil {
+	f, err := os.Create(filename)
+	if err != nil {
 		log.Fatal(err)
-    }
+	}
 	defer f.Close()
-	
+
 	var readCnt uint64
 	var buffer = make([]uint8, rtl.DefaultBufLength)
 	for {
@@ -91,20 +91,19 @@ func (u *SDRCARLOS) ReadTime(filename string, milliseconds int64) {
 	}
 
 	// create file
-    f, err := os.Create(filename)
-    if err != nil {
+	f, err := os.Create(filename)
+	if err != nil {
 		log.Fatal(err)
-    }
+	}
 	defer f.Close()
-	
+
 	var readCnt uint64
 	//var buffer = make([]uint8, rtl.DefaultBufLength)
 	var buffer = make([]uint8, 1024)
-	
-	
+
 	// get current time
 	start := time.Now()
-	
+
 	for {
 		nRead, err := u.Dev.ReadSync(buffer, 1024)
 		if err != nil {
@@ -122,7 +121,6 @@ func (u *SDRCARLOS) ReadTime(filename string, milliseconds int64) {
 			if err != nil {
 				log.Fatal(err)
 			}
-
 
 		}
 		// check time
@@ -146,10 +144,10 @@ func (u *SDRCARLOS) Shutdown() {
 		log.Println("SDRCARLOS shutdown(): closing Device ...")
 	}
 	u.Dev.Close() // preempt the blocking ReadSync call
-	if u.Debug { 
+	if u.Debug {
 		log.Println("SDRCARLOS shutdown(): calling .Wait() ...")
 	}
-	u.Wg.Wait() // Wait for the goroutine to shutdown
+	//u.Wg.Wait() // Wait for the goroutine to shutdown
 	if u.Debug {
 		log.Println("SDRCARLOS shutdown(): .Wait() returned...")
 	}
