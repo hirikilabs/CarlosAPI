@@ -2,6 +2,7 @@ package routes
 
 import (
 	"carlosapi/pkg/controllers"
+	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -15,5 +16,6 @@ func RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/clear", controllers.ClearDatabase).Methods("GET")
 	router.HandleFunc("/download/{id}", controllers.DownloadId).Methods("GET")
 	// Web
+	router.PathPrefix("/static").Handler(http.FileServer(http.Dir("./static/")))
 	router.HandleFunc("/request", controllers.MakeRequest).Methods("GET")
 }
