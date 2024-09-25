@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<header>
+    <title>Request recording</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</header>
+
+<body>
+    <main class="container">
+        <h1>
+            Observation request
+        </h1>
+        <form>
+            <fieldset>
+                <label>
+                    User:
+                    <input name="user" placeholder="User" autocomplete="username" />
+                </label>
+            </fieldset>
+            <fieldset class="grid">
+                <label>
+                    Date and time:
+                    <input type="date" name="date" aria-label="Date">
+                    <input type="time" name="time" aria-label="Time">
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>Radio configuration:</legend>
+                <label>Frequency
+                    <input type="number" name="frequency" value="1420000000" aria-label="Number">
+                    <small id="freq-helper">
+                        Hz.
+                    </small>
+                </label>
+                <label>Sample rate
+                    <input type="number" name="sample_rate" value="2400000" aria-label="Number">
+                </label>
+                <label>Gain
+                    <input type="number" name="gain" value="48.0" min="0.0" max="48.0" step="0.5" aria-label="Number">
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>Data configuration:</legend>
+                <label>Record time
+                    <input type="number" name="record_time" value="5" aria-label="Number">
+                    <small id="record-time-helper">
+                        Time in seconds for each point recorded.
+                    </small>
+                </label>
+                <label>Wait time
+                    <input type="number" name="wait_time" value="5" aria-label="Number">
+                    <small id="wait-time-helper">
+                        Time in seconds to wait between each point recorded.
+                    </small>
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>Coordinates:</legend>
+                <label>Azimuth
+                    <input type="number" name="az" value="0" aria-label="Number" min="0" max="360" step="0.5">
+                    <small id="az-helper">
+                        Azimuth in degrees for the center of the observation.
+                    </small>
+                </label>
+                <label>Elevation
+                    <input type="number" name="el" value="0" aria-label="Number" min="0" max="90" step="0.5">
+                    <small id="az-helper">
+                        Elevation in degrees for the center of the observation.
+                    </small>
+                </label>
+                <label>Azimuth range
+                    <input type="number" name="el" value="0" min="0" max="360" step="1" aria-label="Number">
+                    <small id="az-range-helper">
+                        Range in degrees (aperture) for the azimuth.
+                    </small>
+                </label>
+                <label>Elevation range
+                    <input type="number" name="el" value="0" min="0" max="90" step="1" aria-label="Number">
+                    <small id="el-range-helper">
+                        Range in degrees (aperture) for the elevation.
+                    </small>
+                </label>
+            </fieldset>
+            <input type="submit" value="Make request" />
+        </form>
+    </main>
+</body>
+
+</html>

@@ -5,11 +5,12 @@ import (
 	"carlosapi/pkg/config"
 	"carlosapi/pkg/database"
 	"carlosapi/pkg/models"
-	"carlosapi/pkg/utils"
-	"carlosapi/pkg/sdrcarlos"
 	"carlosapi/pkg/rotor"
+	"carlosapi/pkg/sdrcarlos"
+	"carlosapi/pkg/utils"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -68,7 +69,7 @@ func GetStatusId(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte(`{"error": "No recording with that ID"}`))
 		return
 	}
-	
+
 	res, _ := json.Marshal(recording)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
@@ -105,7 +106,7 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(http.StatusBadRequest)
 		res := fmt.Sprintf("{'error' = '%v'}", err.Error())
 		writer.Write([]byte(res))
-		return		
+		return
 	}
 	// ok, create recording
 	newRecording.Id = time.Now().UnixMilli()
@@ -117,14 +118,13 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 	updateChannel <- models.Notification{}
 
 	// ok
-	log.Printf("📝" + color.Blue + " Added %v\n" + color.Reset, recording.Id)
-	
+	log.Printf("📝"+color.Blue+" Added %v\n"+color.Reset, recording.Id)
+
 	res, _ := json.Marshal(recording)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 	writer.Write(res)
 }
-
 
 // Downloads file for Id
 func DownloadId(writer http.ResponseWriter, request *http.Request) {
@@ -160,8 +160,8 @@ func DownloadId(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	// ok, send file (add header for filename)
-	writer.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", varid + ".tar.gz"))
-	http.ServeFile(writer, request, conf.RecordPath + varid + ".tar.gz")
+	writer.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", varid+".tar.gz"))
+	http.ServeFile(writer, request, conf.RecordPath+varid+".tar.gz")
 }
 
 // Scheduler, checks for due recordings and launches them
@@ -177,11 +177,11 @@ func RunScheduling() {
 
 	// recordings array
 	var newRecordings []models.Recording
-	
+
 	for {
 		// check channel
 		select {
-		case <- updateChannel:
+		case <-updateChannel:
 			// get from database again
 			updateDatabase = true
 		default:
@@ -194,10 +194,10 @@ func RunScheduling() {
 			db.Where("status=?", models.Created).Find(&newRecordings)
 			updateDatabase = false
 		}
-		
+
 		for _, rec := range newRecordings {
 			if rec.Time < time.Now().UnixMilli() && !config.IsRecording() {
-				log.Printf("⚡" + color.Yellow + " Launching %v\n" + color.Reset, rec.Id)
+				log.Printf("⚡"+color.Yellow+" Launching %v\n"+color.Reset, rec.Id)
 				rec.Status = models.Running
 				rec.Update()
 				config.Recording()
@@ -210,7 +210,6 @@ func RunScheduling() {
 		time.Sleep(1 * time.Second)
 	}
 }
-
 
 // runs the recording
 // launched on another thread
@@ -233,23 +232,22 @@ func RunProcess(rec models.Recording) {
 		log.Printf("❌ SDR configure failed: %s\n", err.Error())
 	}
 
-
 	// connect to rotor
 	rot := rotor.NewRotCtl(conf.RotorHost, conf.RotorPort)
 	err = rot.Connect()
-	if (err != nil) {
+	if err != nil {
 		log.Printf("❌ Can't connect to rotor: %s\n", err.Error())
 	}
-	
+
 	// args := fmt.Sprintf(conf.RecordCmd,
 	// 	rec.SampleRate, rec.Frequency, rec.Gain, rec.RecTime,
 	// 	rec.WaitTime, rec.Az, rec.El, rec.AzRange, rec.ElRange,
 	// 	rec.AzStep, rec.ElStep, conf.RecordPath + strconv.FormatInt(rec.Id, 10) + ".iq")
 
 	// log.Println("Args: ", args)
-	
+
 	// create output dir
-	err = os.MkdirAll(conf.RecordPath + strconv.FormatInt(rec.Id, 10), 0755)
+	err = os.MkdirAll(conf.RecordPath+strconv.FormatInt(rec.Id, 10), 0755)
 	if err != nil && !os.IsExist(err) {
 		log.Println("❌ Error creating output directory")
 		log.Println(err.Error())
@@ -259,31 +257,31 @@ func RunProcess(rec models.Recording) {
 	if err == nil && devices != nil {
 		// move rotor to starting point
 		log.Printf("📡 Moving rotor to start point...\n")
-		
-		err:= rot.SetPos(rec.Az - rec.AzRange/2, rec.El - rec.ElRange/2)
+
+		err := rot.SetPos(rec.Az-rec.AzRange/2, rec.El-rec.ElRange/2)
 		if err != nil {
 			log.Printf("❌ Error moving rotor, %s\n", err.Error())
 		}
 
 		// wait
-		for !rot.InPos(rec.Az - rec.AzRange/2, rec.El - rec.ElRange/2) {
+		for !rot.InPos(rec.Az-rec.AzRange/2, rec.El-rec.ElRange/2) {
 			time.Sleep(1 * time.Second)
 		}
 		log.Println("📍 Rotor in place.")
-		
+
 		// ranges
-		for az := rec.Az - rec.AzRange/2; az <= rec.Az + rec.AzRange/2; az += rec.AzStep {
-			for el := rec.El - rec.ElRange/2; el <= rec.El + rec.ElRange/2; el += rec.ElStep {
+		for az := rec.Az - rec.AzRange/2; az <= rec.Az+rec.AzRange/2; az += rec.AzStep {
+			for el := rec.El - rec.ElRange/2; el <= rec.El+rec.ElRange/2; el += rec.ElStep {
 				// move rotor
-				err := rot.SetPos(az, el);
+				err := rot.SetPos(az, el)
 				if err != nil {
 					log.Printf("❌ Error moving rotor, %s\n", err.Error())
 				}
 
 				// wait
 				log.Printf("⏳ Waiting...")
-				time.Sleep(time.Duration(rec.WaitTime) *  time.Millisecond)
-				
+				time.Sleep(time.Duration(rec.WaitTime) * time.Millisecond)
+
 				log.Printf("🔴 Recording: (%3.1f, %3.1f)\n", az, el)
 
 				// record
@@ -296,7 +294,7 @@ func RunProcess(rec models.Recording) {
 		rec.Status = models.Recorded
 		rec.Update()
 		config.NoRecording()
-		
+
 		// create compressed archive
 		log.Printf("🗜️  Creating compressed archive.\n")
 		dirname := fmt.Sprintf("%s%d/", conf.RecordPath, rec.Id)
@@ -324,14 +322,36 @@ func RunProcess(rec models.Recording) {
 
 	// close rotor connection
 	rot.Disconnect()
-	
+
 	// out, err := exec.Command(conf.RecordCmd, args).Output()
-    // if err != nil {
+	// if err != nil {
 	// 	log.Println("❌ Error running record command")
-    //     log.Println(err.Error() + "\n\n" + string(out))
-    // }
+	//     log.Println(err.Error() + "\n\n" + string(out))
+	// }
 	log.Printf("✅ Finishing %v\n", rec.Id)
 	// update status
 	rec.Status = models.Finished
 	rec.Update()
+}
+
+// Webs
+
+// shows request web
+func MakeRequest(writer http.ResponseWriter, request *http.Request) {
+	tmpl, err := template.ParseFiles("html/request.html")
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("Problem loading web page"))
+		return
+	}
+
+	err = tmpl.Execute(writer, nil)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("Problem rendering web page"))
+		return
+	}
+
+	writer.WriteHeader(http.StatusOK)
+	return
 }
