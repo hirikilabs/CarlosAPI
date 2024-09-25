@@ -1,35 +1,35 @@
 package rotor
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"net"
-	"errors"
-	"bytes"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 type RotCtl struct {
 	Host string
 	Port string
-	Az float64
-	El float64
+	Az   float64
+	El   float64
 	Conn *net.TCPConn
 }
 
 func NewRotCtl(host string, port string) *RotCtl {
-	return &RotCtl {
+	return &RotCtl{
 		Host: host,
 		Port: port,
-		Az: 0.0,
-		El: 0.0,
+		Az:   0.0,
+		El:   0.0,
 		Conn: nil,
 	}
 }
 
 func (r *RotCtl) Connect() error {
 	// get server
-	tcpServer, err := net.ResolveTCPAddr("tcp", r.Host + ":" + r.Port)
+	tcpServer, err := net.ResolveTCPAddr("tcp", r.Host+":"+r.Port)
 
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (r *RotCtl) Disconnect() error {
 }
 
 func (r *RotCtl) GetPos() (float64, float64, error) {
-	
+
 	_, err := r.Conn.Write([]byte("p\n"))
 	if err != nil {
 		return 0.0, 0.0, err
@@ -82,7 +82,7 @@ func (r *RotCtl) GetPos() (float64, float64, error) {
 func (r *RotCtl) SetPos(az float64, el float64) error {
 
 	pos_str := fmt.Sprintf("P %.1f %.1f\n", az, el)
-	
+
 	_, err := r.Conn.Write([]byte(pos_str))
 	if err != nil {
 		return err
@@ -99,24 +99,22 @@ func (r *RotCtl) SetPos(az float64, el float64) error {
 	if !strings.Contains(string(rData), "RPRT 0") {
 		return errors.New("Problem setting rotor position")
 	}
-	
+
 	return nil
 }
-
 
 func (r *RotCtl) InPos(az float64, el float64) bool {
 	posaz, posel, err := r.GetPos()
 	if err != nil {
 		return false
 	}
-	
-	if (posaz == az || posaz - 360 == az || posaz + 360 == az) && posel == el {
+
+	if (posaz == az || posaz-360 == az || posaz+360 == az) && (posel == el) {
 		return true
 	} else {
 		return false
 	}
 }
-
 
 func ParsePos(data []byte) (float64, float64, error) {
 	lines := bytes.Split(data, []byte("\n"))
@@ -131,6 +129,5 @@ func ParsePos(data []byte) (float64, float64, error) {
 	}
 
 	return az, el, nil
-	
-}
 
+}
