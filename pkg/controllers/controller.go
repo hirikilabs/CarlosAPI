@@ -289,6 +289,8 @@ func RunProcess(rec models.Recording) {
 					conf.RecordPath, rec.Id, rec.Id, az, el), rec.RecTime)
 			}
 		}
+		// close SDR
+		carlosDev.Shutdown()
 
 		// finished recording
 		rec.Status = models.Recorded
