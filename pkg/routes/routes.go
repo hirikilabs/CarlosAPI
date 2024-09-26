@@ -19,4 +19,5 @@ func RegisterRoutes(router *mux.Router) {
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 	router.HandleFunc("/", controllers.WebRoot).Methods("GET")
 	router.HandleFunc("/request", controllers.WebMakeRequest).Methods("GET")
+	router.HandleFunc("/record", controllers.WebCreateRecording).Methods("POST")
 }
