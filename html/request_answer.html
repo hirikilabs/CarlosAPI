@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<header>
+    <title>Request recording</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css">
+    <link rel="stylesheet" href="static/style.css">
+</header>
+
+<body>
+    <main class="container">
+        <h6 class="pico-color-pink-500">
+            ___/\/\/\/\/\______/\/\______/\/\/\/\/\____/\/\__________/\/\/\/\______/\/\/\/\/\_<br />
+            _/\/\____________/\/\/\/\____/\/\____/\/\__/\/\________/\/\____/\/\__/\/\_________<br />
+            _/\/\__________/\/\____/\/\__/\/\/\/\/\____/\/\________/\/\____/\/\____/\/\/\/\___<br />
+            _/\/\__________/\/\/\/\/\/\__/\/\__/\/\____/\/\________/\/\____/\/\__________/\/\_<br />
+            ___/\/\/\/\/\__/\/\____/\/\__/\/\____/\/\__/\/\/\/\/\____/\/\/\/\____/\/\/\/\/\___<br />   
+        </h6>
+        <h5>Cooperative Amateur RadioTelescope Listening Outer Space</h5>
+        {{if not .}}
+        <h1>
+            Error with the request
+        </h1>
+        {{else}}
+        <h1>
+            Observation queued
+        </h1>
+        <h2>
+            User: {{.User}}
+        </h2>
+        {{end}}
+    </main>
+</body>
+</html>
