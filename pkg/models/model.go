@@ -30,6 +30,7 @@ type Recording struct {
 	gorm.Model
 	Id         int64        `json:"id"`
 	User       string       `json:"user"`
+	Password   string       `json:"password"`
 	Time       int64        `json:"time"`      // unix timestamp
 	Frequency  int          `json:"frequency"` // Hz
 	SampleRate int          `json:"sample_rate"`
@@ -112,4 +113,17 @@ func GetRecordingById(Id int64) (*Recording, *gorm.DB) {
 	var getRecording Recording
 	result := db.Where("id=?", Id).First(&getRecording)
 	return &getRecording, result
+}
+
+// Users
+func GetUsers() []User {
+	var Users []User
+	db.Find(&Users)
+	return Users
+}
+
+func GetUserByName(name string) (*User, *gorm.DB) {
+	var getUser User
+	result := db.Where("user=?", name).First(&getUser)
+	return &getUser, result
 }
