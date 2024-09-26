@@ -8,6 +8,7 @@ import (
 	"carlosapi/pkg/rotor"
 	"carlosapi/pkg/sdrcarlos"
 	"carlosapi/pkg/utils"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -353,6 +354,24 @@ func RunProcess(rec models.Recording) {
 
 // Webs
 
+func WebRoot(writer http.ResponseWriter, request *http.Request) {
+	tmpl, err := template.ParseFiles("html/index.html")
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("Problem loading web page"))
+		return
+	}
+
+	err = tmpl.Execute(writer, nil)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("Problem rendering web page"))
+		return
+	}
+
+	return
+}
+
 // shows request web
 func WebMakeRequest(writer http.ResponseWriter, request *http.Request) {
 	tmpl, err := template.ParseFiles("html/request.html")
@@ -372,15 +391,36 @@ func WebMakeRequest(writer http.ResponseWriter, request *http.Request) {
 	return
 }
 
-func WebRoot(writer http.ResponseWriter, request *http.Request) {
-	tmpl, err := template.ParseFiles("html/index.html")
+func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
+	// prepare template
+	tmpl, err := template.ParseFiles("html/request_answer.html")
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("Problem loading web page"))
 		return
 	}
 
-	err = tmpl.Execute(writer, nil)
+	// get form values
+	rec := &models.Recording{
+		User:     request.PostFormValue("user"),
+		Password: request.PostFormValue("password"),
+	}
+
+	// check password
+	dbUser, _ := models.GetUserByName(rec.User)
+	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(rec.Password)))
+
+	if hash != dbUser.Password {
+		err = tmpl.Execute(writer, nil)
+		if err != nil {
+			writer.WriteHeader(http.StatusInternalServerError)
+			writer.Write([]byte("Problem rendering web page"))
+			return
+		}
+	}
+
+	// everything ok
+	err = tmpl.Execute(writer, rec)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("Problem rendering web page"))
