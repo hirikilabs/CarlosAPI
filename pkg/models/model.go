@@ -124,6 +124,6 @@ func GetUsers() []User {
 
 func GetUserByName(name string) (*User, *gorm.DB) {
 	var getUser User
-	result := db.Where("user=?", name).First(&getUser)
+	result := db.Where("username=?", name).First(&getUser)
 	return &getUser, result
 }
