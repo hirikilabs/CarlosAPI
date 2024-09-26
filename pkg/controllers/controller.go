@@ -400,24 +400,36 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	error := false
 	recAnswer := &models.RecordingAnswer{}
 
-	// get form values
-	recAnswer.Rec = models.Recording{
-		User:     request.PostFormValue("user"),
-		Password: request.PostFormValue("password"),
-	}
+	// get and validate form values
+	user := request.PostFormValue("user")
 
 	// check user
-	dbUser, _ := models.GetUserByName(recAnswer.Rec.User)
+	dbUser, _ := models.GetUserByName(user)
 	if dbUser == nil {
 		recAnswer.ErrorMessage = "Wrong Username"
+		error = true
 	}
 
+	password := request.PostFormValue("password")
 	// check password
 	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(recAnswer.Rec.Password)))
-	if hash != dbUser.Password {
+	if (hash != dbUser.Password) && !error {
 		recAnswer.ErrorMessage = "Wrong Password"
+	}
+
+	date := request.PostFormValue("date")
+	time := request.PostFormValue("time")
+
+	fmt.Println(date)
+	fmt.Println(time)
+	// check date and time
+
+	recAnswer.Rec = models.Recording{
+		User:     user,
+		Password: password,
 	}
 
 	err = tmpl.Execute(writer, recAnswer)
