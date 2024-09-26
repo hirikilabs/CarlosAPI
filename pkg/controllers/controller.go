@@ -415,7 +415,7 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 
 	password := request.PostFormValue("password")
 	// check password
-	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(recAnswer.Rec.Password)))
+	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(password)))
 	if (hash != dbUser.Password) && !errorParsing {
 		recAnswer.ErrorMessage = "Wrong Password"
 	}
