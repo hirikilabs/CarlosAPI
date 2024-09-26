@@ -17,9 +17,13 @@
             ___/\/\/\/\/\__/\/\____/\/\__/\/\____/\/\__/\/\/\/\/\____/\/\/\/\____/\/\/\/\/\___<br />   
         </h6>
         <h5>Cooperative Amateur RadioTelescope Listening Outer Space</h5>
-        {{if not .}}
+        {{if not .User}}
         <h1>
-            Error with the request
+            Bad username
+        </h1>
+        {{else if not .Password}}
+        <h1>
+            Bad password
         </h1>
         {{else}}
         <h1>

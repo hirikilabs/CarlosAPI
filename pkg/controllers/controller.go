@@ -406,20 +406,18 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 		Password: request.PostFormValue("password"),
 	}
 
-	// check password
+	// check user
 	dbUser, _ := models.GetUserByName(rec.User)
-	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(rec.Password)))
-
-	if hash != dbUser.Password {
-		err = tmpl.Execute(writer, nil)
-		if err != nil {
-			writer.WriteHeader(http.StatusInternalServerError)
-			writer.Write([]byte("Problem rendering web page"))
-			return
-		}
+	if dbUser == nil {
+		rec.User = ""
 	}
 
-	// everything ok
+	// check password
+	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(rec.Password)))
+	if hash != dbUser.Password {
+		rec.Password = ""
+	}
+
 	err = tmpl.Execute(writer, rec)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
