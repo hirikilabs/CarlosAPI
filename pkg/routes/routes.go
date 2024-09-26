@@ -9,13 +9,14 @@ import (
 
 func RegisterRoutes(router *mux.Router) {
 	// API
-	router.HandleFunc("/", controllers.Root).Methods("GET")
-	router.HandleFunc("/record", controllers.CreateRecording).Methods("POST")
-	router.HandleFunc("/status", controllers.GetStatus).Methods("GET")
-	router.HandleFunc("/status/{id}", controllers.GetStatusId).Methods("GET")
-	router.HandleFunc("/clear", controllers.ClearDatabase).Methods("GET")
-	router.HandleFunc("/download/{id}", controllers.DownloadId).Methods("GET")
+	router.HandleFunc("/api", controllers.ApiRoot).Methods("GET")
+	router.HandleFunc("/api/record", controllers.ApiCreateRecording).Methods("POST")
+	router.HandleFunc("/api/status", controllers.ApiGetStatus).Methods("GET")
+	router.HandleFunc("/api/status/{id}", controllers.ApiGetStatusId).Methods("GET")
+	router.HandleFunc("/api/clear", controllers.ApiClearDatabase).Methods("GET")
+	router.HandleFunc("/api/download/{id}", controllers.ApiDownloadId).Methods("GET")
 	// Web
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
-	router.HandleFunc("/request", controllers.MakeRequest).Methods("GET")
+	router.HandleFunc("/", controllers.WebRoot).Methods("GET")
+	router.HandleFunc("/request", controllers.WebMakeRequest).Methods("GET")
 }

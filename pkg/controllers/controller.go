@@ -30,8 +30,8 @@ func GetChannel() chan models.Notification {
 	return updateChannel
 }
 
-// "/" return configuration parameters
-func Root(writer http.ResponseWriter, request *http.Request) {
+// "/api" return configuration parameters
+func ApiRoot(writer http.ResponseWriter, request *http.Request) {
 	conf := config.GetConfig()
 
 	res, _ := json.Marshal(conf)
@@ -40,8 +40,8 @@ func Root(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
-// "/status" returns all the recording stored
-func GetStatus(writer http.ResponseWriter, request *http.Request) {
+// "/api/status" returns all the recording stored
+func ApiGetStatus(writer http.ResponseWriter, request *http.Request) {
 	recordings := models.GetRecordings()
 
 	res, _ := json.Marshal(recordings)
@@ -50,8 +50,8 @@ func GetStatus(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
-// "/status/id" returns the status of a recording identified by it's ID
-func GetStatusId(writer http.ResponseWriter, request *http.Request) {
+// "/api/status/id" returns the status of a recording identified by it's ID
+func ApiGetStatusId(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	varid := vars["id"]
 	id, err := strconv.ParseInt(varid, 0, 0)
@@ -76,9 +76,9 @@ func GetStatusId(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
-// "/clear" clears all the data
+// "/api/clear" clears all the data
 // TODO: don't expose this API on prodution
-func ClearDatabase(writer http.ResponseWriter, request *http.Request) {
+func ApiClearDatabase(writer http.ResponseWriter, request *http.Request) {
 	models.ClearDB()
 	res := []byte("{'clear'='ok'}")
 	writer.Header().Set("Content-Type", "application/json")
@@ -86,9 +86,23 @@ func ClearDatabase(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
+// inserts a new recording, returns the ID
+func InsertRecording(rec models.Recording) *models.Recording {
+	// ok, create recording
+	rec.Id = time.Now().UnixMilli()
+	rec.EstimateTime()
+	rec.Status = models.Created
+	recording := rec.CreateRecording()
+
+	// send notification
+	updateChannel <- models.Notification{}
+
+	return recording
+}
+
 // creates a new recording
 // TODO: validate fields
-func CreateRecording(writer http.ResponseWriter, request *http.Request) {
+func ApiCreateRecording(writer http.ResponseWriter, request *http.Request) {
 	// parse JSON
 	newRecording := &models.Recording{}
 	err := utils.ParseBody(request, newRecording)
@@ -109,13 +123,14 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	// ok, create recording
-	newRecording.Id = time.Now().UnixMilli()
-	newRecording.EstimateTime()
-	newRecording.Status = models.Created
-	recording := newRecording.CreateRecording()
+	// newRecording.Id = time.Now().UnixMilli()
+	// newRecording.EstimateTime()
+	// newRecording.Status = models.Created
+	// recording := newRecording.CreateRecording()
 
-	// send notification
-	updateChannel <- models.Notification{}
+	// // send notification
+	// updateChannel <- models.Notification{}
+	recording := InsertRecording(*newRecording)
 
 	// ok
 	log.Printf("📝"+color.Blue+" Added %v\n"+color.Reset, recording.Id)
@@ -127,7 +142,7 @@ func CreateRecording(writer http.ResponseWriter, request *http.Request) {
 }
 
 // Downloads file for Id
-func DownloadId(writer http.ResponseWriter, request *http.Request) {
+func ApiDownloadId(writer http.ResponseWriter, request *http.Request) {
 	// get config for paths
 	conf := config.GetConfig()
 
@@ -339,8 +354,26 @@ func RunProcess(rec models.Recording) {
 // Webs
 
 // shows request web
-func MakeRequest(writer http.ResponseWriter, request *http.Request) {
+func WebMakeRequest(writer http.ResponseWriter, request *http.Request) {
 	tmpl, err := template.ParseFiles("html/request.html")
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("Problem loading web page"))
+		return
+	}
+
+	err = tmpl.Execute(writer, nil)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("Problem rendering web page"))
+		return
+	}
+
+	return
+}
+
+func WebRoot(writer http.ResponseWriter, request *http.Request) {
+	tmpl, err := template.ParseFiles("html/index.html")
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("Problem loading web page"))
