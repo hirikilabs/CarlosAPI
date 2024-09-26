@@ -47,6 +47,11 @@ type Recording struct {
 	Status     RecordStatus `json:"status"`
 }
 
+type RecordingAnswer struct {
+	ErrorMessage string
+	Rec          Recording
+}
+
 type Notification struct{}
 
 func init() {
