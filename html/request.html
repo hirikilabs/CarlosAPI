@@ -83,15 +83,27 @@
                     </small>
                 </label>
                 <label>Azimuth range
-                    <input type="number" name="el" value="0" min="0" max="360" step="1" aria-label="Number">
+                    <input type="number" name="az-range" value="0" min="0" max="360" step="1" aria-label="Number">
                     <small id="az-range-helper">
                         Range in degrees (aperture) for the azimuth.
                     </small>
                 </label>
                 <label>Elevation range
-                    <input type="number" name="el" value="0" min="0" max="90" step="1" aria-label="Number">
+                    <input type="number" name="el-range" value="0" min="0" max="90" step="1" aria-label="Number">
                     <small id="el-range-helper">
                         Range in degrees (aperture) for the elevation.
+                    </small>
+                </label>
+                <label>Azimuth step
+                    <input type="number" name="az-step" value="0" min="0" max="10" step="0.5" aria-label="Number">
+                    <small id="az-step-helper">
+                        Azimuth step (in degrees) between movements.
+                    </small>
+                </label>
+                <label>Elevation step
+                    <input type="number" name="el-step" value="0" min="0" max="10" step="0.5" aria-label="Number">
+                    <small id="el-range-helper">
+                        Elevation step (in degrees) between movements.
                     </small>
                 </label>
             </fieldset>
