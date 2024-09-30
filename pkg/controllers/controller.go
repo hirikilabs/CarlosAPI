@@ -427,7 +427,7 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 	formTime := request.PostFormValue("time")
 
 	timeString := formDate + " " + formTime
-	theTime, err := time.Parse("2006-01-02 03:04", timeString)
+	theTime, err := time.Parse("2006-01-02 15:04", timeString)
 	if err != nil && !errorParsing {
 		recAnswer.ErrorMessage = "Can't parse time or date: " + err.Error()
 		errorParsing = true
