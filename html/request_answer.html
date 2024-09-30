@@ -14,7 +14,7 @@
             _/\/\____________/\/\/\/\____/\/\____/\/\__/\/\________/\/\____/\/\__/\/\_________<br />
             _/\/\__________/\/\____/\/\__/\/\/\/\/\____/\/\________/\/\____/\/\____/\/\/\/\___<br />
             _/\/\__________/\/\/\/\/\/\__/\/\__/\/\____/\/\________/\/\____/\/\__________/\/\_<br />
-            ___/\/\/\/\/\__/\/\____/\/\__/\/\____/\/\__/\/\/\/\/\____/\/\/\/\____/\/\/\/\/\___<br />   
+            ___/\/\/\/\/\__/\/\____/\/\__/\/\____/\/\__/\/\/\/\/\____/\/\/\/\____/\/\/\/\/\___<br />
         </h6>
         <h5>Cooperative Amateur RadioTelescope Listening Outer Space</h5>
         {{if .ErrorMessage}}
@@ -25,10 +25,50 @@
         <h1>
             Observation queued
         </h1>
-        <h2>
-            User: {{.Rec.User}}
-        </h2>
+        <div class="grid">
+            <div>
+                <h2>
+                    Record ID: {{.Rec.Id}}
+                </h2>
+                <h3>
+                    User: {{.Rec.User}}
+                </h3>
+                <h3>
+                    Time: {{.Rec.Time}}
+                </h3>
+                <h3>
+                    Frequency: {{.Rec.Frequency}}
+                </h3>
+                <h3>
+                    Sample rate: {{.Rec.SampleRate}}
+                </h3>
+                <h3>
+                    Gain: {{.Rec.Gain}}
+                </h3>
+            </div>
+            <div>
+                <h3>
+                    Azimuth: {{.Rec.Az}}
+                </h3>
+                <h3>
+                    Elevation: {{.Rec.El}}
+                </h3>
+                <h3>
+                    Azimuth range: {{.Rec.AzRange}}
+                </h3>
+                <h3>
+                    Elevation range: {{.Rec.ElRange}}
+                </h3>
+                <h3>
+                    Azimuth step: {{.Rec.AzStep}}
+                </h3>
+                <h3>
+                    Elevation step: {{.Rec.el-step}}
+                </h3>
+            </div>
+        </div>
         {{end}}
     </main>
 </body>
+
 </html>
