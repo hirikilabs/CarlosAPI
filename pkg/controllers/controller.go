@@ -536,6 +536,7 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 		// ok
 		log.Printf("📝"+color.Blue+" Added %v\n"+color.Reset, recording.Id)
 		recAnswer.Rec.Id = recording.Id
+		recAnswer.StringTime = time.UnixMilli(recAnswer.Rec.Time).Local().String()
 	}
 
 	err = tmpl.Execute(writer, recAnswer)

@@ -50,6 +50,7 @@ type Recording struct {
 type RecordingAnswer struct {
 	ErrorMessage string
 	Rec          Recording
+	StringTime   string
 }
 
 type Notification struct{}
