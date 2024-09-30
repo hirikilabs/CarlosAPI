@@ -455,6 +455,21 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 		errorParsing = true
 	}
 
+	// check recording times
+	formRecTime := request.PostFormValue("record_time")
+	formWaitTime := request.PostFormValue("wait_time")
+
+	rectime, err := strconv.Atoi(formRecTime)
+	if (err != nil || rectime <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong record time"
+		errorParsing = true
+	}
+	waittime, err := strconv.Atoi(formWaitTime)
+	if (err != nil || waittime <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong wait time"
+		errorParsing = true
+	}
+
 	// check coordinates
 	formAz := request.PostFormValue("az")
 	formAzRange := request.PostFormValue("az-range")
@@ -505,6 +520,7 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 		Frequency:  freq,
 		SampleRate: srate,
 		Gain:       int(gain * 10),
+		RecTime: ,
 		Az:         az,
 		AzRange:    azrange,
 		AzStep:     azstep,
