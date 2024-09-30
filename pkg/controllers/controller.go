@@ -516,6 +516,8 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 	if !errorParsing {
 		// ok, insert it
 		recording := InsertRecording(recAnswer.Rec)
+		// ok
+		log.Printf("📝"+color.Blue+" Added %v\n"+color.Reset, recording.Id)
 		recAnswer.Rec.Id = recording.Id
 	}
 
