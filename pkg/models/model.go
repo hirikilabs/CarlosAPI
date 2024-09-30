@@ -65,6 +65,8 @@ func init() {
 
 // add a recording to the database
 func (r *Recording) CreateRecording() *Recording {
+	// dont store passwords
+	r.Password = "*****"
 	db.Create(&r)
 	return r
 }
