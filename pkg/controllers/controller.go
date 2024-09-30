@@ -397,6 +397,7 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("Problem loading web page"))
+		writer.Write([]byte(err.Error()))
 		return
 	}
 
@@ -428,7 +429,7 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 	timeString := formDate + " " + formTime
 	theTime, err := time.Parse("2006-01-02 03:04", timeString)
 	if err != nil && !errorParsing {
-		recAnswer.ErrorMessage = "Can't parse time or date"
+		recAnswer.ErrorMessage = "Can't parse time or date: " + err.Error()
 		errorParsing = true
 	}
 
@@ -512,9 +513,11 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 		ElStep:     elstep,
 	}
 
-	// ok, insert it
-	recording := InsertRecording(recAnswer.Rec)
-	recAnswer.Rec.Id = recording.Id
+	if !errorParsing {
+		// ok, insert it
+		recording := InsertRecording(recAnswer.Rec)
+		recAnswer.Rec.Id = recording.Id
+	}
 
 	err = tmpl.Execute(writer, recAnswer)
 	if err != nil {
