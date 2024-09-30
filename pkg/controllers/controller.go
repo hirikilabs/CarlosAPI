@@ -404,34 +404,117 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 	recAnswer := &models.RecordingAnswer{}
 
 	// get and validate form values
-	user := request.PostFormValue("user")
 
 	// check user
-	dbUser, _ := models.GetUserByName(user)
+	formUser := request.PostFormValue("user")
+	dbUser, _ := models.GetUserByName(formUser)
 	if dbUser == nil {
 		recAnswer.ErrorMessage = "Wrong Username"
 		errorParsing = true
 	}
 
-	password := request.PostFormValue("password")
 	// check password
-	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(password)))
+	formPassword := request.PostFormValue("password")
+	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(formPassword)))
 	if (hash != dbUser.Password) && !errorParsing {
 		recAnswer.ErrorMessage = "Wrong Password"
 		errorParsing = true
 	}
 
-	date := request.PostFormValue("date")
-	time := request.PostFormValue("time")
-
-	fmt.Println(date)
-	fmt.Println(time)
 	// check date and time
+	formDate := request.PostFormValue("date")
+	formTime := request.PostFormValue("time")
+
+	timeString := formDate + " " + formTime
+	theTime, err := time.Parse("2006-01-02 03:04", timeString)
+	if err != nil && !errorParsing {
+		recAnswer.ErrorMessage = "Can't parse time or date"
+		errorParsing = true
+	}
+
+	// check SDR config
+	formFreq := request.PostFormValue("frequency")
+	formSrate := request.PostFormValue("sample_rate")
+	formGain := request.PostFormValue("gain")
+
+	freq, err := strconv.Atoi(formFreq)
+	if (err != nil || freq <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong frequency"
+		errorParsing = true
+	}
+	srate, err := strconv.Atoi(formSrate)
+	if (err != nil || srate <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong sample rate"
+		errorParsing = true
+	}
+
+	gain, err := strconv.ParseFloat(formGain, 64)
+	if (err != nil || gain <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong gain"
+		errorParsing = true
+	}
+
+	// check coordinates
+	formAz := request.PostFormValue("az")
+	formAzRange := request.PostFormValue("az-range")
+	formAzStep := request.PostFormValue("az-step")
+
+	az, err := strconv.ParseFloat(formAz, 64)
+	if (err != nil || az <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong azimuth"
+		errorParsing = true
+	}
+	azrange, err := strconv.ParseFloat(formAzRange, 64)
+	if (err != nil || azrange <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong azimuth range"
+		errorParsing = true
+	}
+
+	azstep, err := strconv.ParseFloat(formAzStep, 64)
+	if (err != nil || azstep <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong azimuth step"
+		errorParsing = true
+	}
+
+	formEl := request.PostFormValue("el")
+	formElRange := request.PostFormValue("el-range")
+	formElStep := request.PostFormValue("el-step")
+
+	el, err := strconv.ParseFloat(formEl, 64)
+	if (err != nil || el <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong elevation"
+		errorParsing = true
+	}
+	elrange, err := strconv.ParseFloat(formElRange, 64)
+	if (err != nil || elrange <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong elevation range"
+		errorParsing = true
+	}
+
+	elstep, err := strconv.ParseFloat(formElStep, 64)
+	if (err != nil || elstep <= 0) && !errorParsing {
+		recAnswer.ErrorMessage = "Wrong elevation step"
+		errorParsing = true
+	}
 
 	recAnswer.Rec = models.Recording{
-		User:     user,
-		Password: password,
+		User:       formUser,
+		Password:   formPassword,
+		Time:       theTime.UnixMilli(),
+		Frequency:  freq,
+		SampleRate: srate,
+		Gain:       int(gain * 10),
+		Az:         az,
+		AzRange:    azrange,
+		AzStep:     azstep,
+		El:         el,
+		ElRange:    elrange,
+		ElStep:     elstep,
 	}
+
+	// ok, insert it
+	recording := InsertRecording(recAnswer.Rec)
+	recAnswer.Rec.Id = recording.Id
 
 	err = tmpl.Execute(writer, recAnswer)
 	if err != nil {
