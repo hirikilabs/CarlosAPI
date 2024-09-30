@@ -81,7 +81,7 @@ func ApiGetStatusId(writer http.ResponseWriter, request *http.Request) {
 // TODO: don't expose this API on prodution
 func ApiClearDatabase(writer http.ResponseWriter, request *http.Request) {
 	models.ClearDB()
-	res := []byte("{'clear'='ok'}")
+	res := []byte(`{"clear": "ok"}`)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 	writer.Write(res)
