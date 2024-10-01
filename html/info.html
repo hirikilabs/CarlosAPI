@@ -29,7 +29,7 @@
             <div>
                 <h2>
                     {{if eq .Rec.Status "Finished"}}
-                        Record ID: <a href="api/download/{{.Rec.Id}}">{{.Rec.Id}}</a>
+                        Record ID: <a href="/api/download/{{.Rec.Id}}">{{.Rec.Id}}</a>
                     {{else}}
                         Record ID: {{.Rec.Id}}
                     {{end}}
