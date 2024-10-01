@@ -20,6 +20,22 @@
         <h1>
             Welcome
         </h1>
+        <h2>
+            Record status:
+        </h2>
+        <table>
+            <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .}}
+                <tr><td>{{.Id}}</td><td>{{.Status}}</td></tr>
+                {{end}}
+            </tbody>
+        </table>
     </main>
 </body>
 </html>

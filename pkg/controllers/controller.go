@@ -381,7 +381,8 @@ func WebMakeRequest(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	err = tmpl.Execute(writer, nil)
+	recordings := models.GetRecordings()
+	err = tmpl.Execute(writer, recordings)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("Problem rendering web page"))
