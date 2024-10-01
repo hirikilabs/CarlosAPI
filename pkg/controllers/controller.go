@@ -549,3 +549,38 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 
 	return
 }
+
+// "/api/status/id" returns the status of a recording identified by it's ID
+func WebInfo(writer http.ResponseWriter, request *http.Request) {
+	// prepare template
+	tmpl, err := template.ParseFiles("html/info.html")
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("Problem loading web page"))
+		writer.Write([]byte(err.Error()))
+		return
+	}
+
+	recAnswer := &models.RecordingAnswer{}
+
+	vars := mux.Vars(request)
+	varid := vars["id"]
+	id, err := strconv.ParseInt(varid, 0, 0)
+	if err != nil {
+		log.Printf("❌ ID Web Info ID Error %v\n", err.Error())
+		recAnswer.ErrorMessage = "Problem parsing ID"
+	}
+
+	recording, result := models.GetRecordingById(id)
+	if result.Error != nil {
+		recAnswer.ErrorMessage = "No such ID in database"
+	}
+	recAnswer.Rec = *recording
+
+	err = tmpl.Execute(writer, recAnswer)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Write([]byte("Problem rendering web page"))
+		return
+	}
+}

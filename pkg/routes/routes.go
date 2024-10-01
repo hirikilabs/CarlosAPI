@@ -20,4 +20,5 @@ func RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/", controllers.WebRoot).Methods("GET")
 	router.HandleFunc("/request", controllers.WebMakeRequest).Methods("GET")
 	router.HandleFunc("/record", controllers.WebCreateRecording).Methods("POST")
+	router.HandleFunc("/info/{id}", controllers.WebInfo).Methods("GET")
 }

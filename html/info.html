@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<header>
+    <title>Recording info</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css">
+    <link rel="stylesheet" href="static/style.css">
+</header>
+
+<body>
+    <main class="container">
+        <h6 class="pico-color-pink-500">
+            ___/\/\/\/\/\______/\/\______/\/\/\/\/\____/\/\__________/\/\/\/\______/\/\/\/\/\_<br />
+            _/\/\____________/\/\/\/\____/\/\____/\/\__/\/\________/\/\____/\/\__/\/\_________<br />
+            _/\/\__________/\/\____/\/\__/\/\/\/\/\____/\/\________/\/\____/\/\____/\/\/\/\___<br />
+            _/\/\__________/\/\/\/\/\/\__/\/\__/\/\____/\/\________/\/\____/\/\__________/\/\_<br />
+            ___/\/\/\/\/\__/\/\____/\/\__/\/\____/\/\__/\/\/\/\/\____/\/\/\/\____/\/\/\/\/\___<br />   
+        </h6>
+        <h5>Cooperative Amateur RadioTelescope Listening Outer Space</h5>
+        {{if .ErrorMessage}}
+        <h2>
+            {{.ErrorMessage}}
+        </h2>
+        {{else}}
+        <h1>
+            Record information:
+        </h1>
+        <div class="grid">
+            <div>
+                <h2>
+                    {{if eq .Rec.Status "Finished"}}
+                        Record ID: <a href="api/download/{{.Rec.Id}}">{{.Rec.Id}}</a>
+                    {{else}}
+                        Record ID: {{.Rec.Id}}
+                    {{end}}
+                </h2>
+                <h3>
+                    User: {{.Rec.User}}
+                </h3>
+                <h3>
+                    Time: {{.StringTime}}
+                </h3>
+                <h3>
+                    Frequency: {{.Rec.Frequency}} Hz
+                </h3>
+                <h3>
+                    Sample rate: {{.Rec.SampleRate}}
+                </h3>
+                <h3>
+                    Gain: {{.Rec.Gain}} dB
+                </h3>
+                <h3>
+                    Record Time: {{.Rec.RecTime}} ms
+                </h3>
+                <h3>
+                    Wait Time: {{.Rec.WaitTime}} ms
+                </h3>
+            </div>
+            <div>
+                <h3>
+                    Azimuth: {{.Rec.Az}} º
+                </h3>
+                <h3>
+                    Elevation: {{.Rec.El}} º
+                </h3>
+                <h3>
+                    Azimuth range: {{.Rec.AzRange}} º
+                </h3>
+                <h3>
+                    Elevation range: {{.Rec.ElRange}} º
+                </h3>
+                <h3>
+                    Azimuth step: {{.Rec.AzStep}} º
+                </h3>
+                <h3>
+                    Elevation step: {{.Rec.ElStep}} º
+                </h3>
+            </div>
+        </div>
+        {{end}}
+    </main>
+</body>
+</html>
