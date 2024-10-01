@@ -22,55 +22,55 @@
             {{.ErrorMessage}}
         </h2>
         {{else}}
-        <h1>
+        <h6>
             Observation queued
-        </h1>
+        </h6>
         <div class="grid">
             <div>
-                <h2>
+                <h5>
                     Record ID: {{.Rec.Id}}
-                </h2>
-                <h3>
+                </h5>
+                <h6>
                     User: {{.Rec.User}}
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Time: {{.StringTime}}
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Frequency: {{.Rec.Frequency}} Hz
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Sample rate: {{.Rec.SampleRate}}
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Gain: {{.Rec.Gain}} dB
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Record Time: {{.Rec.RecTime}} ms
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Wait Time: {{.Rec.WaitTime}} ms
-                </h3>
+                </h6>
             </div>
             <div>
-                <h3>
+                <h6>
                     Azimuth: {{.Rec.Az}} º
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Elevation: {{.Rec.El}} º
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Azimuth range: {{.Rec.AzRange}} º
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Elevation range: {{.Rec.ElRange}} º
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Azimuth step: {{.Rec.AzStep}} º
-                </h3>
-                <h3>
+                </h6>
+                <h6>
                     Elevation step: {{.Rec.ElStep}} º
-                </h3>
+                </h6>
             </div>
         </div>
         {{end}}
