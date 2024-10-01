@@ -248,13 +248,6 @@ func RunProcess(rec models.Recording) {
 		log.Printf("❌ Can't connect to rotor: %s\n", err.Error())
 	}
 
-	// args := fmt.Sprintf(conf.RecordCmd,
-	// 	rec.SampleRate, rec.Frequency, rec.Gain, rec.RecTime,
-	// 	rec.WaitTime, rec.Az, rec.El, rec.AzRange, rec.ElRange,
-	// 	rec.AzStep, rec.ElStep, conf.RecordPath + strconv.FormatInt(rec.Id, 10) + ".iq")
-
-	// log.Println("Args: ", args)
-
 	// create output dir
 	err = os.MkdirAll(conf.RecordPath+strconv.FormatInt(rec.Id, 10), 0755)
 	if err != nil && !os.IsExist(err) {
