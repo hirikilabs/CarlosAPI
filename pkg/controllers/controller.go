@@ -124,13 +124,6 @@ func ApiCreateRecording(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	// ok, create recording
-	// newRecording.Id = time.Now().UnixMilli()
-	// newRecording.EstimateTime()
-	// newRecording.Status = models.Created
-	// recording := newRecording.CreateRecording()
-
-	// // send notification
-	// updateChannel <- models.Notification{}
 	recording := InsertRecording(*newRecording)
 
 	// ok
