@@ -33,7 +33,7 @@
             <tbody>
                 {{range .}}
                     {{if eq .Status "Finished"}}
-                        <tr><td><a href="download/{{.Id}}">{{.Id}}</a></td><td>{{.Status}}</td></tr>
+                        <tr><td><a href="api/download/{{.Id}}">{{.Id}}</a></td><td>{{.Status}}</td></tr>
                     {{else}}
                         <tr><td>{{.Id}}</td><td>{{.Status}}</td></tr>
                     {{end}}
