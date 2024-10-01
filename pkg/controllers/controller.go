@@ -549,6 +549,7 @@ func WebInfo(writer http.ResponseWriter, request *http.Request) {
 
 	recAnswer := &models.RecordingAnswer{}
 
+	// get ID from request
 	vars := mux.Vars(request)
 	varid := vars["id"]
 	id, err := strconv.ParseInt(varid, 0, 0)
@@ -557,12 +558,17 @@ func WebInfo(writer http.ResponseWriter, request *http.Request) {
 		recAnswer.ErrorMessage = "Problem parsing ID"
 	}
 
+	// get ID data
 	recording, result := models.GetRecordingById(id)
 	if result.Error != nil {
 		recAnswer.ErrorMessage = "No such ID in database"
 	}
-	recAnswer.Rec = *recording
 
+	// fill data
+	recAnswer.Rec = *recording
+	recAnswer.StringTime = time.UnixMilli(recAnswer.Rec.Time).Local().String()
+
+	// render
 	err = tmpl.Execute(writer, recAnswer)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
