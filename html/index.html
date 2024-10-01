@@ -32,7 +32,11 @@
             </thead>
             <tbody>
                 {{range .}}
-                <tr><td>{{.Id}}</td><td>{{.Status}}</td></tr>
+                    {{if eq .Status "Finished"}}
+                        <tr><td><a href="download/{{.Id}}">{{.Id}}</a></td><td>{{.Status}}</td></tr>
+                    {{else}}
+                        <tr><td>{{.Id}}</td><td>{{.Status}}</td></tr>
+                    {{end}}
                 {{end}}
             </tbody>
         </table>
