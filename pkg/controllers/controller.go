@@ -236,7 +236,7 @@ func RunProcess(rec models.Recording) {
 
 	// use first device
 	indexID := 0
-	err := carlosDev.Config(indexID, rec.SampleRate, rec.Frequency, 0, rec.Gain, true)
+	err := carlosDev.Config(indexID, rec.SampleRate, rec.Frequency, 1000000, rec.Gain, true)
 	if err != nil {
 		log.Printf("❌ SDR configure failed: %s\n", err.Error())
 	}
