@@ -268,6 +268,7 @@ func RunProcess(rec models.Recording) {
 		// wait
 		for !rot.InPos(rec.Az-rec.AzRange/2, rec.El-rec.ElRange/2) {
 			time.Sleep(1 * time.Second)
+			log.Print(".")
 		}
 		log.Println("📍 Rotor in place.")
 
@@ -534,7 +535,11 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 // "/api/status/id" returns the status of a recording identified by it's ID
 func WebInfo(writer http.ResponseWriter, request *http.Request) {
 	// prepare template
-	tmpl, err := template.ParseFiles("html/info.html")
+	tmpl, err := template.New("html/info.html").Funcs(template.FuncMap{
+		"divideByTen": func(value int) float32 {
+			return float32(value) / 10.0
+		},
+	}).ParseFiles("html/info.html")
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("Problem loading web page"))
