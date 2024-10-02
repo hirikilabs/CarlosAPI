@@ -532,12 +532,12 @@ func WebCreateRecording(writer http.ResponseWriter, request *http.Request) {
 	return
 }
 
-// "/api/status/id" returns the status of a recording identified by it's ID
+// "/info/id" returns the status of a recording identified by it's ID
 func WebInfo(writer http.ResponseWriter, request *http.Request) {
 	// prepare template
-	tmpl, err := template.New("html/info.html").Funcs(template.FuncMap{
-		"divideByTen": func(value int) float32 {
-			return float32(value) / 10.0
+	tmpl, err := template.New("info.html").Funcs(template.FuncMap{
+		"formatGain": func(val int) string {
+			return fmt.Sprintf(".1f", (float32(val) / 10.0))
 		},
 	}).ParseFiles("html/info.html")
 	if err != nil {
@@ -572,7 +572,7 @@ func WebInfo(writer http.ResponseWriter, request *http.Request) {
 	err = tmpl.Execute(writer, recAnswer)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("Problem rendering web page"))
+		writer.Write([]byte("Problem rendering web page\n"))
 		writer.Write([]byte(err.Error()))
 		return
 	}
