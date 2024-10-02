@@ -538,7 +538,7 @@ func WebInfo(writer http.ResponseWriter, request *http.Request) {
 	tmpl, err := template.New("info.html").Funcs(template.FuncMap{
 		"formatGain": func(val int) string {
 			fval := float32(val) / 10.0
-			return fmt.Sprintf(".1f", fval)
+			return fmt.Sprintf("%.1f", fval)
 		},
 	}).ParseFiles("html/info.html")
 	if err != nil {
