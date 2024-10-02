@@ -327,11 +327,6 @@ func RunProcess(rec models.Recording) {
 	// close rotor connection
 	rot.Disconnect()
 
-	// out, err := exec.Command(conf.RecordCmd, args).Output()
-	// if err != nil {
-	// 	log.Println("❌ Error running record command")
-	//     log.Println(err.Error() + "\n\n" + string(out))
-	// }
 	log.Printf("✅ Finishing %v\n", rec.Id)
 	// update status
 	rec.Status = models.Finished
