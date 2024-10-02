@@ -276,7 +276,7 @@ func (u *SDRCARLOS) Config(indexID int, samplerate int, freq int, bw int, gain i
 	}
 
 	// Bias-T
-	err = u.Dev.SetBiasTee(true)
+	err = u.Dev.SetBiasTee(bias)
 	if err != nil {
 		u.Dev.Close()
 		if u.Debug {
