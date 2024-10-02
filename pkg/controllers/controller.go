@@ -541,7 +541,6 @@ func WebInfo(writer http.ResponseWriter, request *http.Request) {
 		},
 	}).ParseFiles("html/info.html")
 	if err != nil {
-		log.Println(err.Error())
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("Problem loading web page"))
 		writer.Write([]byte(err.Error()))
@@ -574,6 +573,7 @@ func WebInfo(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("Problem rendering web page"))
+		writer.Write([]byte(err.Error()))
 		return
 	}
 }
