@@ -55,7 +55,7 @@
                     Sample rate: {{.Rec.SampleRate}}
                 </h6>
                 <h6>
-                    Gain: {{divideByTen .Rec.Gain}} dB
+                    Gain: {{printf "%.1f" divideByTen .Rec.Gain}} dB
                 </h6>
                 <h6>
                     Record Time: {{.Rec.RecTime}} ms
